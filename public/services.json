@@ -1,0 +1,76 @@
+[
+   {
+    "title": "Product Photography (Bags, Shoes, Jewelry, Watches, etc.)",
+    "tag": "Product Photography",
+    "slug": "product-photography",
+    "desc": "Product Photography (Bags, Shoes, Jewelry, Watches, etc.)",
+    "img": "/servicesImg/Product-Photography/7-F.jpg",
+    "sampleImg": [
+      "/servicesImg/Product-Photography/1.jpg",
+      "/servicesImg/Product-Photography/2.jpg",
+      "/servicesImg/Product-Photography/3.jpg",
+      "/servicesImg/Product-Photography/4.jpg",
+      "/servicesImg/Product-Photography/5.jpg",
+      "/servicesImg/Product-Photography/6.jpg",
+      "/servicesImg/Product-Photography/7-F.jpg"
+    ]
+  },
+  {
+    "title": "Apparel & Garment Photography",
+    "tag": "Apparel",
+    "slug": "apparel-and-garment-photography",
+    "desc": "Optimized product photos sized and edited for online listings and ads. Optimized product photos sized and edited for online listings and ads. Optimized product photos sized and edited for online listings and ads.",
+    "img": "/servicesImg/Apparel-&-Garment-Photography/1-F.jpg",
+    "sampleImg": [
+      "/servicesImg/Apparel-&-Garment-Photography/1-F.jpg",
+      "/servicesImg/Apparel-&-Garment-Photography/2.jpg",
+      "/servicesImg/Apparel-&-Garment-Photography/3.jpg"
+    ]
+  },
+  {
+    "title": "Corporate Head Shots",
+    "tag": "Corporate Head-Shots",
+    "slug": "corporate-head-shots",
+    "desc": "Professional headshots for corporate branding and personal use.",
+    "img": "/servicesImg/Corporate-Head-Shots/Jamirul-1-F.jpg",
+    "sampleImg": [
+      "/servicesImg/Corporate-Head-Shots/Jamirul-1-F.jpg",
+      "/servicesImg/Corporate-Head-Shots/Jamirul-2.jpg"
+    ]
+  },
+  {
+    "title": "Fashion & Model Photography",
+    "tag": "Fashion",
+    "slug": "fashion-and-model-photography",
+    "desc": "Headshots, facility photography and editorial assets for comms.",
+    "img": "/servicesImg/Fashion-&-Model-Photography/4-F.jpg",
+    "sampleImg": [
+      "/servicesImg/Fashion-&-Model-Photography/1.jpg",
+      "/servicesImg/Fashion-&-Model-Photography/2.jpg",
+      "/servicesImg/Fashion-&-Model-Photography/3.jpg",
+      "/servicesImg/Fashion-&-Model-Photography/4-F.jpg",
+      "/servicesImg/Fashion-&-Model-Photography/5.jpg"
+    ]
+  },
+  {
+    "title": "Furniture Photography",
+    "tag": "Furniture",
+    "slug": "furniture-photography",
+    "desc": "Controlled lighting and crisp detail for high-res deliverables.",
+    "img": "/servicesImg/Furniture-Photography/2-F.jpg",
+    "sampleImg": [
+      "/servicesImg/Furniture-Photography/1.jpg",
+      "/servicesImg/Furniture-Photography/2-F.jpg"
+    ]
+  },
+  {
+    "title": "Photo Retouching",
+    "tag": "Retouching",
+    "slug": "photo-retouching",
+    "desc": "Concept, styling and art direction to fit your brand voice.",
+    "img": "/servicesImg/Photo-Retouching/Jewelry-Photo-Retouching-Services.jpg",
+    "sampleImg": [
+      "/servicesImg/Photo-Retouching/Jewelry-Photo-Retouching-Services.jpg"
+    ]
+  }
+]
