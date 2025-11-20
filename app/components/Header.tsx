@@ -2,11 +2,11 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { ModeToggle } from "@/components/ui/theme-toggle";
 
 export default function Header() {
   return (
-    <header className="bg-[#f5f5f5] w-full py-2 fixed z-50">
-      {" "}
+    <header className="w-full py-2 fixed z-50 bg-white dark:bg-black border-b border-muted-foreground/10 top-0">
       <div className="container mx-auto flex items-center justify-between px-4 h-auto">
         <Link href="/" className="shrink-0">
           <Image
@@ -44,6 +44,7 @@ export default function Header() {
             <span className="font-bold text-sm">Jake Moor</span>
             <span className="text-xs text-muted-foreground">Super Admin</span>
           </div>
+          <ModeToggle />
         </div>
       </div>
     </header>
