@@ -1,5 +1,4 @@
 "use client";
-
 import {
   Sidebar,
   SidebarContent,
@@ -63,7 +62,7 @@ export function AppSidebar() {
             <div className="flex items-center gap-2">
               <div className="w-4 h-px bg-muted-foreground/30"></div>
               <Link href="/blog/new-post">
-                <span
+                <div
                   className={`flex items-center gap-2 text-sm cursor-pointer ${
                     pathname.startsWith("/blog/new-post")
                       ? "text-red-600 font-bold"
@@ -72,7 +71,7 @@ export function AppSidebar() {
                 >
                   <CirclePlus className="w-4 h-4" />
                   Create New Post
-                </span>
+                </div>
               </Link>
             </div>
 
