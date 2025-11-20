@@ -53,7 +53,7 @@ export default function AppDashboard() {
   const handleCardClick = () => {
     fileInputRef.current?.click();
   };
-  
+
   return (
     <div className="mx-20">
       {/* Dashboard Cards Section */}
@@ -99,7 +99,6 @@ export default function AppDashboard() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {/* Write New Post Card */}
           <Link href="/blog/new-post">
             <Card className="p-0 border-2 border-gray-200 dark:border-gray-700 shadow-none rounded-lg hover:shadow-md transition-shadow cursor-pointer bg-white dark:bg-gray-800">
               <CardContent className="flex flex-col gap-3 p-6">
@@ -135,17 +134,14 @@ export default function AppDashboard() {
 
           {/* Upload Photos Card */}
           <div>
-            {/* 1. Link the input to the ref */}
             <input
               type="file"
               ref={fileInputRef} // <- Linked to the ref
               className="hidden"
               multiple
               accept="image/*"
-              // You would usually add an onChange handler here
             />
 
-            {/* 2. Add the click handler to the Card */}
             <Card
               onClick={handleCardClick} // <- Added click handler
               className="p-0 border-2 border-gray-200 dark:border-gray-700 shadow-none rounded-lg hover:shadow-md transition-shadow cursor-pointer bg-white dark:bg-gray-800"
