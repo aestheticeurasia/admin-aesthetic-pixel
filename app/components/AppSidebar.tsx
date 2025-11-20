@@ -9,8 +9,8 @@ import {
   BookOpen,
   CirclePlus,
   CirclePower,
+  FileImage,
   HomeIcon,
-  Image,
   Settings,
   SquarePen,
   UserPlus,
@@ -101,7 +101,7 @@ export function AppSidebar() {
                 pathname.startsWith("/category") ? activeClass : inactiveClass
               }`}
             >
-              <Image className="w-4 h-4" />
+              <FileImage className="w-4 h-4" />
               Category
             </div>
           </Link>
@@ -139,7 +139,8 @@ export function AppSidebar() {
             </div>
           </div>
         </div>
-        {/* Category */}
+
+        {/* Users */}
         <div className="space-y-3 mt-4">
           <Link href="/users">
             <div
