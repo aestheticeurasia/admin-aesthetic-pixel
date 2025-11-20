@@ -48,11 +48,11 @@ const dashboardCards = [
 ];
 
 export default function AppDashboard() {
-  const fileInputRef = useRef(null);
+ const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleCardClick = () => {
-    fileInputRef.current.click();
-  };
+const handleCardClick = () => {
+  fileInputRef.current?.click(); 
+  
   return (
     <div className="mx-20">
       {/* Dashboard Cards Section */}
