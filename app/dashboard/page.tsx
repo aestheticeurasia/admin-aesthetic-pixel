@@ -9,6 +9,8 @@ import {
   Camera,
   GalleryHorizontal,
 } from "lucide-react";
+import Link from "next/link";
+import { useRef } from "react";
 
 const dashboardCards = [
   {
@@ -45,25 +47,12 @@ const dashboardCards = [
   },
 ];
 
-const quickActions = [
-  {
-    icon: <Camera className="h-6 w-6 text-red-500" />,
-    title: "Write New Post",
-    description: "Share your latest photography story",
-  },
-  {
-    icon: <GalleryHorizontal className="h-6 w-6 text-red-500" />,
-    title: "View Blog",
-    description: "Browse all your published posts",
-  },
-  {
-    icon: <Camera className="h-6 w-6 text-red-500" />,
-    title: "Upload Photos",
-    description: "Add new images to your gallery",
-  },
-];
-
 export default function AppDashboard() {
+  const fileInputRef = useRef(null);
+
+  const handleCardClick = () => {
+    fileInputRef.current.click();
+  };
   return (
     <div className="mx-20">
       {/* Dashboard Cards Section */}
@@ -87,7 +76,9 @@ export default function AppDashboard() {
                 {card.number}
               </p>
 
-              <p className={`text-sm ${card.contentTextColor} dark:text-red-400`}>
+              <p
+                className={`text-sm ${card.contentTextColor} dark:text-red-400`}
+              >
                 {card.content}
               </p>
             </CardContent>
@@ -96,35 +87,80 @@ export default function AppDashboard() {
       </section>
 
       {/* Quick Actions Section */}
-      <section>
-        <div className="mt-10">
-          <span className="ms-10 text-center md:text-start">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-              Quick Actions
-            </h2>
-            <p className="text-gray-600 dark:text-gray-300 mb-6">
-              Start creating and managing your content
-            </p>
-          </span>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {quickActions.map((action, index) => (
-              <Card
-                key={`action-${index}`}
-                className="p-0 border-2 border-gray-200 dark:border-gray-700 shadow-none rounded-lg hover:shadow-md transition-shadow cursor-pointer bg-white dark:bg-gray-800"
-              >
-                <CardContent className="flex flex-col gap-3 p-6">
-                  <div className={`p-2 rounded-lg bg-red-500/10 self-start`}>
-                    {action.icon}
-                  </div>
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mt-2">
-                    {action.title}
-                  </h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-300">
-                    {action.description}
-                  </p>
-                </CardContent>
-              </Card>
-            ))}
+      <section className="mt-10">
+        <div className="ms-10 text-center md:text-start">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+            Quick Actions
+          </h2>
+          <p className="text-gray-600 dark:text-gray-300 mb-6">
+            Start creating and managing your content
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {/* Write New Post Card */}
+          <Link href="/blog/new-post">
+            <Card className="p-0 border-2 border-gray-200 dark:border-gray-700 shadow-none rounded-lg hover:shadow-md transition-shadow cursor-pointer bg-white dark:bg-gray-800">
+              <CardContent className="flex flex-col gap-3 p-6">
+                <div className="p-2 rounded-lg bg-red-500/10 self-start">
+                  <Camera className="h-6 w-6 text-red-500" />
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mt-2">
+                  Write New Post
+                </h3>
+                <p className="text-sm text-gray-600 dark:text-gray-300">
+                  Share your latest photography story
+                </p>
+              </CardContent>
+            </Card>
+          </Link>
+
+          {/* View Blog Card */}
+          <Link href="/blog">
+            <Card className="p-0 border-2 border-gray-200 dark:border-gray-700 shadow-none rounded-lg hover:shadow-md transition-shadow cursor-pointer bg-white dark:bg-gray-800">
+              <CardContent className="flex flex-col gap-3 p-6">
+                <div className="p-2 rounded-lg bg-red-500/10 self-start">
+                  <GalleryHorizontal className="h-6 w-6 text-red-500" />
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mt-2">
+                  View Blog
+                </h3>
+                <p className="text-sm text-gray-600 dark:text-gray-300">
+                  Browse all your published posts
+                </p>
+              </CardContent>
+            </Card>
+          </Link>
+
+          {/* Upload Photos Card */}
+          <div>
+            {/* 1. Link the input to the ref */}
+            <input
+              type="file"
+              ref={fileInputRef} // <- Linked to the ref
+              className="hidden"
+              multiple
+              accept="image/*"
+              // You would usually add an onChange handler here
+            />
+
+            {/* 2. Add the click handler to the Card */}
+            <Card
+              onClick={handleCardClick} // <- Added click handler
+              className="p-0 border-2 border-gray-200 dark:border-gray-700 shadow-none rounded-lg hover:shadow-md transition-shadow cursor-pointer bg-white dark:bg-gray-800"
+            >
+              <CardContent className="flex flex-col gap-3 p-6">
+                <div className="p-2 rounded-lg bg-red-500/10 self-start">
+                  <Camera className="h-6 w-6 text-red-500" />
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mt-2">
+                  Upload Photos
+                </h3>
+                <p className="text-sm text-gray-600 dark:text-gray-300">
+                  Add new images to your gallery
+                </p>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </section>

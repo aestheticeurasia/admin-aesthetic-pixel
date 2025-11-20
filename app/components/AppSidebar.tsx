@@ -34,7 +34,7 @@ export function AppSidebar() {
         <div className="mt-10">
           <Link href="/dashboard">
             <div
-              className={`flex items-center px-8 gap-2 font-bold cursor-pointer ${
+              className={`flex items-center px-2 gap-2 font-bold cursor-pointer ${
                 pathname.startsWith("/dashboard") ? activeClass : inactiveClass
               }`}
             >
@@ -102,7 +102,7 @@ export function AppSidebar() {
                 pathname.startsWith("/category") ? activeClass : inactiveClass
               }`}
             >
-              <BookOpen className="w-4 h-4" />
+              <Image className="w-4 h-4" />
               Category
             </div>
           </Link>
