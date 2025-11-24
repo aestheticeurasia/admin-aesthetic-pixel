@@ -42,7 +42,7 @@ export default function RootLayout({
             <SidebarProvider>
               <AppSidebar />
               <div className="flex-1 overflow-y-auto p-4">
-                <SidebarTrigger className="md:hidden block fixed bg-white dark:bg-gray-800 border" />
+                <SidebarTrigger className="md:hidden fixed bg-white dark:bg-gray-800 border p-5 rounded-md z-50" />
                 <main className="mt-6">{children}</main>
               </div>
             </SidebarProvider>
