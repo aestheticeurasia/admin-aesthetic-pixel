@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/select";
 import Image from "next/image";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Trash2 } from "lucide-react";
+import { Trash2, X } from "lucide-react";
 
 const permissionsList = [
   { value: "view-dashboard", label: "View Dashboard" },
@@ -38,7 +38,7 @@ export default function AddUser() {
     <div className="container mx-auto p-8">
       <div className="flex justify-between items-center mb-10 md:mb-4">
         <span className="text-xl font-bold">Add New User</span>
-          <div className="space-x-2">
+        <div className="space-x-2">
           <Button variant="destructive" className="font-bold cursor-pointer">
             Save
           </Button>
@@ -50,41 +50,63 @@ export default function AddUser() {
       <div className="flex flex-col md:flex-row gap-6">
         <div className="bg-[#f4f5f7] dark:bg-gray-800 py-4 px-8 rounded-lg w-full md:w-2/3">
           <h1 className="font-bold text-lg mb-5">Basic Information</h1>
-          <Label htmlFor="fullName">Full Name</Label>
-          <Input type="text" className="my-4" placeholder="Full Name" />
-          <Label htmlFor="email">Email Address</Label>
-          <Input type="email" className="my-4" placeholder="Email Address" />
-          <Label htmlFor="phoneNumber">Phone Number</Label>
-          <Input type="tel" className="my-4" placeholder="Phone Number" />
-          <Label htmlFor="role">Role</Label>
-          <Select value={role} onValueChange={setRole}>
-            <div className="flex gap-2">
-              <SelectTrigger id="role" className="my-4 w-full">
-                <SelectValue placeholder="Role" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="admin">Admin</SelectItem>
-                <SelectItem value="editor">Editor</SelectItem>
-                <SelectItem value="viewer">Viewer</SelectItem>
-              </SelectContent>
-              {role && (
-                <button
-                  onClick={() => setRole("")}
-                  className="text-sm px-2 cursor-pointer rounded-full"
-                >
-                  ✖️
-                </button>
-              )}
+
+          <div className="space-y-4 md:space-y-7">
+            <div>
+              <Label htmlFor="fullName">Full Name</Label>
+              <Input type="text" className="my-2" placeholder="Full Name" />
             </div>
-          </Select>
-          <Label htmlFor="password">Password</Label>
-          <Input type="password" className="my-4" placeholder="Password" />
+
+            <div>
+              <Label htmlFor="email">Email Address</Label>
+              <Input
+                type="email"
+                className="my-2"
+                placeholder="Email Address"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="phoneNumber">Phone Number</Label>
+              <Input type="tel" className="my-2" placeholder="Phone Number" />
+            </div>
+
+            <div>
+              <Label htmlFor="role">Role</Label>
+              <Select value={role} onValueChange={setRole}>
+                <div className="flex gap-2">
+                  <SelectTrigger id="role" className="my-2 w-full">
+                    <SelectValue placeholder="Role" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="admin">Admin</SelectItem>
+                    <SelectItem value="editor">Editor</SelectItem>
+                    <SelectItem value="viewer">Viewer</SelectItem>
+                  </SelectContent>
+                  {role && (
+                    <button
+                      onClick={() => setRole("")}
+                      className="text-sm px-2 cursor-pointer rounded-full"
+                    >
+                      <X />
+                    </button>
+                  )}
+                </div>
+              </Select>
+            </div>
+
+            <div>
+              <Label htmlFor="password">Password</Label>
+              <Input type="password" className="my-2" placeholder="Password" />
+            </div>
+          </div>
         </div>
+
         <div className="w-full md:w-1/3 h-full">
           <div className="bg-[#f4f5f7] dark:bg-gray-800 py-4 px-8 rounded-lg">
             <h1 className="font-bold text-lg mb-5">Profile & Permissions</h1>
             <div className="text-center mt-4">
-              <div className="w-32 h-32 mx-auto rounded-full overflow-hidden border">
+              <div className="w-32 h-32 mx-auto rounded-full overflow-hidden">
                 <Image
                   src={
                     avatar
@@ -99,21 +121,30 @@ export default function AddUser() {
                   className="object-cover w-full h-full"
                 />
               </div>
-
-              {avatar && (
-                <Button
-                  variant="destructive"
-                  className="mt-3 cursor-pointer"
-                  onClick={() => setAvatar(null)}
-                >
-                  <Trash2 />
-                </Button>
-              )}
             </div>
-            <label className="w-max cursor-pointer mx-auto flex justify-center">
-              <Button variant="outline" className="mt-3" asChild>
-                <span>{avatar ? avatar.name : "Upload Photo"}</span>
-              </Button>
+            <label className="cursor-pointer mx-auto flex flex-col items-center">
+              <div className="flex flex-wrap items-center justify-center gap-3 mt-3">
+                {/* Upload Button */}
+                <Button variant="outline" asChild>
+                  <span className="max-w-[140px] truncate">
+                    {avatar ? avatar.name : "Upload Photo"}
+                  </span>
+                </Button>
+
+                {avatar && (
+                  <Button
+                    variant="destructive"
+                    className="cursor-pointer"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setAvatar(null);
+                    }}
+                  >
+                    <Trash2 />
+                  </Button>
+                )}
+              </div>
+
               <Input
                 type="file"
                 name="photo"
@@ -126,6 +157,7 @@ export default function AddUser() {
                 hidden
               />
             </label>
+
             <hr className="my-5" />
             <h3 className="font-bold text-md my-5">Permissions</h3>
             <div className="flex flex-col gap-2 ml-5 my-3">
