@@ -55,9 +55,9 @@ export default function AppDashboard() {
   };
 
   return (
-    <div className="mx-20">
+    <div className="mx-0 md:mx-20">
       {/* Dashboard Cards Section */}
-      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:py-10">
+      <section className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:py-10">
         {dashboardCards.map((card, index) => (
           <Card
             key={index}
