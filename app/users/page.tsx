@@ -46,7 +46,7 @@ export default function UsersList() {
       </div>
 
       <Table className="bg-[#3f4f5f7] rounded-lg overflow-hidden mt-3">
-        <TableHeader>
+        <TableHeader className="bg-[#f4f5f7]">
           <TableRow>
             <TableHead className="dark:text-gray-100 font-extrabold">
               ID
