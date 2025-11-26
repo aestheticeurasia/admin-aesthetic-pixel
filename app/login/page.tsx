@@ -29,7 +29,7 @@ export default function Login() {
   const router = useRouter();
 
   //handle Login
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
 
@@ -38,25 +38,27 @@ export default function Login() {
     loginData.append("email", email);
     loginData.append("phone", phone);
     loginData.append("password", password);
+    
     try {
       const res = await axios.post(
         `${process.env.NEXT_PUBLIC_SERVER_ADDRESS}/api/v1/auth/login`,
         loginData
       );
-      if (res & res.data.success) {
+
+      if (res && res.data.success) {
         setAuth({
           ...auth,
           user: res.data.user,
           token: res.data.token,
         });
-      }
-      toast.success(res.data && res.data.message);
-
-      if (res.data.success === true) {
+        
         const params = new URLSearchParams(window.location.search);
         const redirectTo = params.get("from") || "/";
         router.push(redirectTo);
       }
+      
+      toast.success(res.data && res.data.message);
+
     } catch (error: unknown) {
       if (axios.isAxiosError(error) && error.response) {
         toast.error(error.response.data.error || "Something went wrong");
