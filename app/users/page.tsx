@@ -134,13 +134,18 @@ export default function UsersList() {
                 colSpan={9}
                 className="text-center py-4 dark:text-gray-100"
               >
-             <Spinner/>   Loading users...
+                <div className="flex justify-center items-center space-x-2">
+                  <Spinner />
+                  <span>Loading users...</span>
+                </div>
               </TableCell>
             </TableRow>
           ) : allUsers.length > 0 ? (
             allUsers.map((user, index) => (
               <TableRow key={user._id} className="dark:hover:bg-gray-700">
-                <TableCell className="dark:text-gray-100">{index + 1}</TableCell>
+                <TableCell className="dark:text-gray-100">
+                  {index + 1}
+                </TableCell>
                 <TableCell className="dark:text-gray-100">
                   {user?.name}
                 </TableCell>
