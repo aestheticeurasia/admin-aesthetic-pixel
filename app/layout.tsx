@@ -7,6 +7,7 @@ import Header from "./components/Header";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "./components/AppSidebar";
 import { ThemeProvider } from "next-themes";
+import { usePathname } from "next/navigation";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({
@@ -19,6 +20,9 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const pathname = usePathname();
+  const hideHeader = pathname === "/login";
+
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
@@ -37,18 +41,23 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <Toaster theme="dark" position="top-center" offset={35} />
-          <Header />
-          <div className="flex pt-[90px] min-h-[calc(100vh-90px)]">
-            <SidebarProvider>
-              <AppSidebar />
-              <div className="flex-1 overflow-y-auto p-4">
-                <SidebarTrigger className="md:hidden fixed bg-white dark:bg-gray-800 border p-5 rounded-md z-50" />
-                <main className="mt-6">{children}</main>
-              </div>
-            </SidebarProvider>
-          </div>
+
+          {!hideHeader && <Header />}
+          {!hideHeader ? (
+            <div className="flex pt-[90px] min-h-[calc(100vh-90px)]">
+              <SidebarProvider>
+                <AppSidebar />
+                <div className="flex-1 overflow-y-auto p-4">
+                  <SidebarTrigger className="md:hidden fixed bg-white dark:bg-gray-800 border p-5 rounded-md z-50" />
+                  <main className="mt-6">{children}</main>
+                </div>
+              </SidebarProvider>
+            </div>
+          ) : (
+            <main className="min-h-screen">{children}</main>
+          )}
         </ThemeProvider>
       </body>
     </html>
   );
-};
+}
