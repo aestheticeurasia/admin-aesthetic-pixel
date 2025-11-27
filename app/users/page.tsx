@@ -94,13 +94,15 @@ export default function UsersList() {
       if (data.success) {
         toast.success(data.message);
         getAllUsers();
-        setUserToDelete(null); // Close the dialog on success
+        setUserToDelete(null);
       } else {
         toast.error(data.message);
       }
     } catch (error: unknown) {
       if (axios.isAxiosError(error) && error.response) {
-        toast.error(error.response.data.error || "Something went wrong");
+        const errorMessage =
+          error.response.data.message || "Something went wrong";
+        toast.error(errorMessage);
       } else {
         console.error(error);
         toast.error("Something went wrong");
