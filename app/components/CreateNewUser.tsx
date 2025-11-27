@@ -24,13 +24,12 @@ const permissionsList = [
   { value: "configure-settings", label: "Configure Settings" },
 ];
 
-export default function AddNewUser({
-  onClose,
-  onUserCreated,
-}: {
+interface AddNewUserProps {
   onClose?: () => void;
   onUserCreated?: () => void;
-}) {
+}
+
+export default function AddNewUser({ onClose, onUserCreated }: AddNewUserProps) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
