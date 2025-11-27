@@ -28,6 +28,7 @@ import axios from "axios";
 import { toast } from "sonner";
 import dayjs from "dayjs";
 import { Spinner } from "@/components/ui/spinner";
+import { Badge } from "@/components/ui/badge";
 
 interface User {
   _id: string;
@@ -74,7 +75,7 @@ export default function UsersList() {
   }, []);
 
   return (
-    <div className="container mx-auto p-8">
+    <div className="container mx-auto py-8 md:px-8">
       {/* Header */}
       <div className="flex justify-between items-center mb-4">
         <span className="text-xl font-bold">Users List</span>
@@ -87,8 +88,13 @@ export default function UsersList() {
           </DialogTrigger>
 
           <DialogContent className="sm:max-w-[1200px] w-full max-h-[90vh] overflow-y-auto">
-            <DialogHeader />
-            <AddNewUser />
+            <DialogHeader >
+              <span className="text-xl font-bold">Add New User</span>
+            </DialogHeader>
+            <AddNewUser
+              onClose={() => setAddUserModalOpen(false)}
+              onUserCreated={getAllUsers}
+            />
           </DialogContent>
         </Dialog>
       </div>
@@ -144,7 +150,7 @@ export default function UsersList() {
             allUsers.map((user, index) => (
               <TableRow key={user._id} className="dark:hover:bg-gray-700">
                 <TableCell className="dark:text-gray-100">
-                  {index + 1}
+                  <b> {index + 1}</b>
                 </TableCell>
                 <TableCell className="dark:text-gray-100">
                   {user?.name}
@@ -156,10 +162,31 @@ export default function UsersList() {
                   {user?.phone}
                 </TableCell>
                 <TableCell className="dark:text-gray-100">
-                  {user?.role}
+                  <Badge
+                    className={`
+    capitalize
+    ${
+      user?.role === "Admin"
+        ? "bg-yellow-500 font-extrabold text-black"
+        : user?.role === "Moderator"
+        ? "bg-sky-500 font-bold text-white"
+        : "bg-gray-500 text-white"
+    }
+  `}
+                  >
+                    {user?.role}
+                  </Badge>
                 </TableCell>
                 <TableCell className="dark:text-gray-100">
-                  {user?.status}
+                  <Badge
+                    className={`
+    capitalize
+    ${user?.status === "Active" ? "bg-blue-600 font-bold text-white" : ""}
+    ${user?.status === "Blocked" ? "bg-red-600 font-bold text-white" : ""}
+  `}
+                  >
+                    {user?.status}
+                  </Badge>
                 </TableCell>
                 <TableCell className="dark:text-gray-100">
                   {dayjs(user?.createdAt).format("DD-MMM-YYYY hh:mm A")}
@@ -167,7 +194,6 @@ export default function UsersList() {
                 <TableCell className="dark:text-gray-100">
                   {dayjs(user?.updatedAt).format("DD-MMM-YYYY hh:mm A")}
                 </TableCell>
-
                 <TableCell className="dark:text-gray-100">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>

@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Image from "next/image";
 import Link from "next/link";
-import { useState,FormEvent } from "react";
+import { useState, FormEvent } from "react";
 import { toast } from "sonner";
 import axios from "axios";
 import { useRouter } from "next/navigation";
@@ -36,7 +36,7 @@ export default function Login() {
     loginData.append("email", email);
     loginData.append("phone", phone);
     loginData.append("password", password);
-    
+
     try {
       const res = await axios.post(
         `${process.env.NEXT_PUBLIC_SERVER_ADDRESS}/api/v1/auth/login`,
@@ -49,14 +49,13 @@ export default function Login() {
           user: res.data.user,
           token: res.data.token,
         });
-        
+
         const params = new URLSearchParams(window.location.search);
         const redirectTo = params.get("from") || "/";
         router.push(redirectTo);
       }
-      
-      toast.success(res.data && res.data.message);
 
+      toast.success(res.data && res.data.message);
     } catch (error: unknown) {
       if (axios.isAxiosError(error) && error.response) {
         toast.error(error.response.data.error || "Something went wrong");
@@ -76,7 +75,8 @@ export default function Login() {
       <div className="container max-w-5xl relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
           <div className="flex flex-col items-center lg:items-start text-center lg:text-left space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
-            <div className="relative w-full flex justify-center md:justify-start">
+            {/* Logo */}
+            {/* <div className="relative w-full flex justify-center md:justify-start">
               <div className="absolute inset-0 bg-red-500/20 blur-2xl rounded-full dark:bg-red-900/20" />
               <Image
                 src="/logo.png"
@@ -95,10 +95,10 @@ export default function Login() {
                 className="relative hidden dark:block w-40 md:w-[150px] h-auto object-contain"
                 priority
               />
-            </div>
+            </div> */}
 
-            <div className="space-y-4">
-              <h1 className="font-extrabold text-4xl sm:text-5xl tracking-tight text-gray-900 dark:text-gray-50">
+            <div className="space-y-5">
+              <h1 className="font-extrabold text-4xl sm:text-5xl tracking-tight text-gray-900 dark:text-gray-50 leading-snug">
                 Welcome to <br />
                 Aesthetic{" "}
                 <span className="text-red-600 dark:text-red-500">

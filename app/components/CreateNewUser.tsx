@@ -24,7 +24,13 @@ const permissionsList = [
   { value: "configure-settings", label: "Configure Settings" },
 ];
 
-export default function AddNewUser() {
+export default function AddNewUser({
+  onClose,
+  onUserCreated,
+}: {
+  onClose?: () => void;
+  onUserCreated?: () => void;
+}) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -51,12 +57,7 @@ export default function AddNewUser() {
     createNewUser.append("phone", phone);
     createNewUser.append("role", role);
     createNewUser.append("password", password);
-
-    // Append permissions (FormData handles arrays by appending same key multiple times or stringifying)
-    // Option A: Send as JSON string
     createNewUser.append("permissions", JSON.stringify(permissions));
-    // Option B: If backend expects array, loop and append:
-    // permissions.forEach(p => createNewUser.append("permissions", p));
 
     if (avatar) {
       createNewUser.append("avatar", avatar);
@@ -69,7 +70,17 @@ export default function AddNewUser() {
       );
 
       toast.success(res.data && res.data.message);
-      // Optional: Reset form here
+
+      // Reset form
+      setName("");
+      setEmail("");
+      setPhone("");
+      setRole("");
+      setPassword("");
+      setAvatar(null);
+      setPermissions([]);
+      onUserCreated();
+      onClose();
     } catch (error: unknown) {
       if (axios.isAxiosError(error) && error.response) {
         toast.error(error.response.data.error || "Something went wrong");
@@ -83,11 +94,8 @@ export default function AddNewUser() {
   };
 
   return (
-    <div className="container mx-auto py-8 px-2 md:px-8">
+    <div className="container">
       <form onSubmit={handleCreate}>
-        <div className="flex justify-between items-center mb-10 md:mb-4">
-          <span className="text-xl font-bold">Add New User</span>
-        </div>
         <div className="flex flex-col md:flex-row gap-6">
           {/* Left Column */}
           <div className="bg-[#f4f5f7] dark:bg-gray-800 py-4 px-8 rounded-lg w-full md:w-2/3">
@@ -274,6 +282,7 @@ export default function AddNewUser() {
                 Save
               </Button>
               <Button
+                onClick={onClose}
                 variant="secondary"
                 className="font-bold cursor-pointer"
                 type="button"
