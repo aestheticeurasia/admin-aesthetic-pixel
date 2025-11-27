@@ -194,7 +194,7 @@ export function AppSidebar() {
           </div>
         </Link>
 
-        {/* User Profile */}
+        {/* Profile */}
         <Link href="/profile">
           <div
             className={`flex items-center gap-3 font-bold mt-4 cursor-pointer ${
@@ -202,7 +202,7 @@ export function AppSidebar() {
             }`}
           >
             <UserRound className="w-4 h-4" />
-            User Profile
+            Profile
           </div>
         </Link>
       </SidebarContent>

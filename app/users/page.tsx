@@ -39,6 +39,7 @@ import { toast } from "sonner";
 import dayjs from "dayjs";
 import { Spinner } from "@/components/ui/spinner";
 import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface User {
   _id: string;
@@ -198,7 +199,15 @@ export default function UsersList() {
                   <b> {index + 1}</b>
                 </TableCell>
                 <TableCell className="dark:text-gray-100">
-                  {user?.name}
+                  <div className="flex gap-2 items-center">
+                    <Avatar>
+                      <AvatarImage
+                        src="https://github.com/shadcn.png"
+                      />
+                      <AvatarFallback>CN</AvatarFallback>
+                    </Avatar>
+                    <span className="font-bold"> {user?.name}</span>
+                  </div>
                 </TableCell>
                 <TableCell className="dark:text-gray-100">
                   {user?.email}
