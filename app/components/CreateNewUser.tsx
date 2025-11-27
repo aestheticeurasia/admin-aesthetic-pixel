@@ -29,7 +29,10 @@ interface AddNewUserProps {
   onUserCreated?: () => void;
 }
 
-export default function AddNewUser({ onClose, onUserCreated }: AddNewUserProps) {
+export default function AddNewUser({
+  onClose,
+  onUserCreated,
+}: AddNewUserProps) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -70,7 +73,7 @@ export default function AddNewUser({ onClose, onUserCreated }: AddNewUserProps) 
 
       toast.success(res.data && res.data.message);
 
-      // Reset form
+      // Reset form values after successful creation
       setName("");
       setEmail("");
       setPhone("");
@@ -78,8 +81,10 @@ export default function AddNewUser({ onClose, onUserCreated }: AddNewUserProps) 
       setPassword("");
       setAvatar(null);
       setPermissions([]);
-      onUserCreated();
-      onClose();
+
+      // Call callbacks function for closing modal and refreshing user list
+      onUserCreated?.();
+      onClose?.();
     } catch (error: unknown) {
       if (axios.isAxiosError(error) && error.response) {
         toast.error(error.response.data.error || "Something went wrong");
