@@ -72,8 +72,8 @@ export default function Login() {
     <div className="relative min-h-screen w-full flex items-center justify-center p-4 bg-gray-50 dark:bg-gray-950 overflow-hidden">
       <div className="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] bg-red-500/10 rounded-full blur-[100px] pointer-events-none" />
       <div className="absolute bottom-[-10%] left-[-5%] w-[500px] h-[500px] bg-blue-500/5 dark:bg-blue-900/10 rounded-full blur-[100px] pointer-events-none" />
-      <div className="container max-w-5xl relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+      <div className="container  md:px-20 relative z-10">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-60 items-center">
           <div className="flex flex-col items-center lg:items-start text-center lg:text-left space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
             {/* Logo */}
             {/* <div className="relative w-full flex justify-center md:justify-start">
