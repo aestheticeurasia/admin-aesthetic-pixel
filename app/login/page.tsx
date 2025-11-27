@@ -126,20 +126,20 @@ export default function Login() {
                 </CardHeader>
 
                 <CardContent>
-                  <form className="space-y-5">
+                  <div className="space-y-5">
                     <div className="grid gap-2">
                       <Label
                         htmlFor="email"
                         className="text-gray-700 dark:text-gray-300"
                       >
-                        Email
+                        Email or Phone
                       </Label>
                       <Input
                         value={email || phone}
                         onChange={(e) => (
                           setEmail(e.target.value), setPhone(e.target.value)
                         )}
-                        placeholder="name@aestheticpixel.com"
+                        placeholder="Email or Phone"
                         className="h-11 bg-gray-50 dark:bg-gray-950/50 focus-visible:ring-red-500/30 border-gray-200 dark:border-gray-800"
                         required
                       />
@@ -166,10 +166,11 @@ export default function Login() {
                         id="password"
                         type="password"
                         className="h-11 bg-gray-50 dark:bg-gray-950/50 focus-visible:ring-red-500/30 border-gray-200 dark:border-gray-800"
+                        placeholder="Password"
                         required
                       />
                     </div>
-                  </form>
+                  </div>
                 </CardContent>
 
                 <CardFooter className="flex flex-col gap-4 pt-2 mb-3">

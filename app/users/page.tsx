@@ -21,7 +21,7 @@ import {
   DialogHeader,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { MoreHorizontal, Edit, Trash } from "lucide-react";
+import { MoreHorizontal, Edit, Trash, UserPlus } from "lucide-react";
 import { useEffect, useState } from "react";
 import AddNewUser from "../components/CreateNewUser";
 import axios from "axios";
@@ -82,12 +82,12 @@ export default function UsersList() {
 
         <Dialog open={addUserModalOpen} onOpenChange={setAddUserModalOpen}>
           <DialogTrigger asChild>
-            <Button variant="destructive" className="font-bold cursor-pointer">
-              Add User
+            <Button variant="destructive" className="font-bold cursor-pointer flex items-center">
+             <UserPlus className="font-bold"/> Add User
             </Button>
           </DialogTrigger>
 
-          <DialogContent className="sm:max-w-[1200px] w-full max-h-[90vh] overflow-y-auto">
+          <DialogContent className="sm:max-w-[1100px] w-full max-h-[90vh] overflow-y-auto">
             <DialogHeader >
               <span className="text-xl font-bold">Add New User</span>
             </DialogHeader>

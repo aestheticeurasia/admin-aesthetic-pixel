@@ -12,9 +12,10 @@ import {
 } from "@/components/ui/select";
 import Image from "next/image";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Trash2, X, Loader2 } from "lucide-react"; // Imported Loader2
+import { Trash2, X, Loader2, UploadCloud } from "lucide-react";
 import axios from "axios";
 import { toast } from "sonner";
+import { redirect } from "next/navigation";
 
 const permissionsList = [
   { value: "view-dashboard", label: "View Dashboard" },
@@ -73,7 +74,7 @@ export default function AddNewUser({
 
       toast.success(res.data && res.data.message);
 
-      // Reset form values after successful creation
+      // Reset form values
       setName("");
       setEmail("");
       setPhone("");
@@ -82,9 +83,9 @@ export default function AddNewUser({
       setAvatar(null);
       setPermissions([]);
 
-      // Call callbacks function for closing modal and refreshing user list
       onUserCreated?.();
       onClose?.();
+      redirect("/users");
     } catch (error: unknown) {
       if (axios.isAxiosError(error) && error.response) {
         toast.error(error.response.data.error || "Something went wrong");
@@ -98,206 +99,224 @@ export default function AddNewUser({
   };
 
   return (
-    <div className="container">
+    <div className="w-full max-w-6xl mx-auto p-4 md:p-6">
       <form onSubmit={handleCreate}>
-        <div className="flex flex-col md:flex-row gap-6">
-          {/* Left Column */}
-          <div className="bg-[#f4f5f7] dark:bg-gray-800 py-4 px-8 rounded-lg w-full md:w-2/3">
-            <h1 className="font-bold text-lg mb-5">Basic Information</h1>
-            <div className="space-y-4 md:space-y-7">
-              <div>
-                <Label htmlFor="fullName">Full Name</Label>
-                <Input
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  type="text"
-                  className="my-4 bg-white dark:bg-gray-700"
-                  placeholder="Full Name"
-                  disabled={loading}
-                  required
-                />
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          
+          {/* Left Column: Basic Information */}
+          <div className="lg:col-span-2 space-y-6">
+            <div className="bg-card border rounded-xl shadow-sm overflow-hidden">
+              <div className="px-6 py-4 border-b bg-muted/40">
+                <h1 className="font-semibold text-lg text-foreground">
+                  Basic Information
+                </h1>
               </div>
+              
+              <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <Label htmlFor="fullName">Full Name</Label>
+                  <Input
+                    id="fullName"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    type="text"
+                    placeholder="Full Name"
+                    disabled={loading}
+                    required
+                  />
+                </div>
 
-              <div>
-                <Label htmlFor="email">Email Address</Label>
-                <Input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="my-4 bg-white dark:bg-gray-700"
-                  placeholder="Email Address"
-                  disabled={loading}
-                  required
-                />
-              </div>
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email Address</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="Email Address"
+                    disabled={loading}
+                    required
+                  />
+                </div>
 
-              <div>
-                <Label htmlFor="phoneNumber">Phone Number</Label>
-                <Input
-                  type="tel"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  className="my-4 bg-white dark:bg-gray-700"
-                  placeholder="Phone Number"
-                  disabled={loading}
-                />
-              </div>
+                <div className="space-y-2">
+                  <Label htmlFor="phoneNumber">Phone Number</Label>
+                  <Input
+                    id="phoneNumber"
+                    type="tel"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    placeholder="Phone Number"
+                    disabled={loading}
+                  />
+                </div>
 
-              <div>
-                <Label htmlFor="role">Role</Label>
-                <Select value={role} onValueChange={setRole} disabled={loading}>
-                  <div className="flex gap-2">
-                    <SelectTrigger
-                      id="role"
-                      className="my-4 w-full bg-white dark:bg-gray-700"
-                    >
-                      <SelectValue placeholder="Role" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Admin">Admin</SelectItem>
-                      <SelectItem value="Moderator">Moderator</SelectItem>
-                      <SelectItem value="Viewer">Viewer</SelectItem>
-                    </SelectContent>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="role">Role</Label>
                     {role && (
                       <button
                         type="button"
                         onClick={() => setRole("")}
-                        className="text-sm px-2 cursor-pointer rounded-full"
+                        className="text-xs text-muted-foreground hover:text-destructive flex items-center gap-1 transition-colors cursor-pointer"
                         disabled={loading}
                       >
-                        <X />
+                         Clear
+                         <X className="h-3 w-3" />
                       </button>
                     )}
                   </div>
-                </Select>
-              </div>
+                  <Select value={role} onValueChange={setRole} disabled={loading}>
+                    <SelectTrigger id="role" className="w-full cursor-pointer">
+                      <SelectValue placeholder="Role" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Admin" className="cursor-pointer">Admin</SelectItem>
+                      <SelectItem value="Moderator" className="cursor-pointer">Moderator</SelectItem>
+                      <SelectItem value="Viewer" className="cursor-pointer">Viewer</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
 
-              <div>
-                <Label htmlFor="password">Password</Label>
-                <Input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="my-4 bg-white dark:bg-gray-700"
-                  placeholder="Password"
-                  disabled={loading}
-                  required
-                />
+                <div className="space-y-2 md:col-span-2">
+                  <Label htmlFor="password">Password</Label>
+                  <Input
+                    id="password"
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Password"
+                    disabled={loading}
+                    required
+                  />
+                </div>
               </div>
             </div>
           </div>
 
-          {/* Right Column */}
-          <div className="w-full md:w-1/3 h-full">
-            <div className="bg-[#f4f5f7] dark:bg-gray-800 py-4 px-8 rounded-lg">
-              <h1 className="font-bold text-lg mb-8 text-center">
-                Profile & Permissions
-              </h1>
-              <div className="text-center my-4">
-                <div className="w-32 h-32 mx-auto rounded-full overflow-hidden">
-                  <Image
-                    src={
-                      avatar
-                        ? typeof avatar === "string"
-                          ? avatar
-                          : URL.createObjectURL(avatar)
-                        : demoAvatar
-                    }
-                    alt="profile-img"
-                    width={128}
-                    height={128}
-                    className="object-cover w-full h-full"
-                  />
-                </div>
+          {/* Right Column: Profile & Permissions */}
+          <div className="lg:col-span-1 space-y-6">
+            <div className="bg-card border rounded-xl shadow-sm overflow-hidden h-full flex flex-col">
+              <div className="px-6 py-4 border-b bg-muted/40 text-center lg:text-left">
+                <h1 className="font-semibold text-lg text-foreground">
+                  Profile & Permissions
+                </h1>
               </div>
-              <label className="cursor-pointer mx-auto flex flex-col items-center">
-                <div className="flex flex-wrap items-center justify-center gap-3 mt-3">
-                  <Button
-                    variant="outline"
-                    asChild
-                    disabled={loading}
-                    type="button"
-                  >
-                    <span className="max-w-[140px] truncate">
-                      {avatar ? avatar.name : "Upload Photo"}
-                    </span>
-                  </Button>
 
-                  {avatar && (
-                    <Button
-                      variant="destructive"
-                      className="cursor-pointer"
-                      type="button"
-                      disabled={loading}
-                      onClick={(e) => {
-                        e.preventDefault();
-                        setAvatar(null);
-                      }}
-                    >
-                      <Trash2 />
-                    </Button>
-                  )}
-                </div>
-
-                <Input
-                  type="file"
-                  name="photo"
-                  accept="image/*"
-                  onChange={(e) => {
-                    if (e.target.files && e.target.files[0])
-                      setAvatar(e.target.files[0]);
-                    e.target.value = "";
-                  }}
-                  hidden
-                  disabled={loading}
-                />
-              </label>
-
-              <hr className="my-5" />
-              <h3 className="font-bold text-md my-5">Permissions</h3>
-              <div className="flex flex-col gap-2 ml-5 my-3">
-                {permissionsList.map((perm) => (
-                  <div key={perm.value} className="flex items-center py-1">
-                    <Checkbox
-                      id={perm.value}
-                      checked={permissions.includes(perm.value)}
-                      disabled={loading}
-                      onCheckedChange={(checked) =>
-                        handlePermissionChange(perm.value, checked === true)
+              <div className="p-6 flex-1 flex flex-col">
+                {/* Avatar Section */}
+                <div className="flex flex-col items-center justify-center mb-8">
+                  <div className="relative w-32 h-32 rounded-full overflow-hidden border-4 border-muted shadow-sm mb-4 bg-muted">
+                    <Image
+                      src={
+                        avatar
+                          ? typeof avatar === "string"
+                            ? avatar
+                            : URL.createObjectURL(avatar)
+                          : demoAvatar
                       }
+                      alt="profile-img"
+                      fill
+                      className="object-cover"
                     />
-                    <Label htmlFor={perm.value} className="ml-2">
-                      {perm.label}
-                    </Label>
                   </div>
-                ))}
-              </div>
-            </div>
+                  
+                  <div className="flex items-center gap-2">
+                    <Label
+                      htmlFor="photo-upload"
+                      className="cursor-pointer"
+                    >
+                      <div className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 px-4 py-2">
+                        <UploadCloud className="w-4 h-4 mr-2" />
+                        <span className="max-w-[120px] truncate">
+                          {avatar ? avatar.name : "Upload Photo"}
+                        </span>
+                      </div>
+                      <Input
+                        id="photo-upload"
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => {
+                          if (e.target.files && e.target.files[0])
+                            setAvatar(e.target.files[0]);
+                          e.target.value = "";
+                        }}
+                        className="hidden"
+                        disabled={loading}
+                      />
+                    </Label>
 
-            {/* Bottom Buttons (Duplicated for mobile convenience) */}
-            <div className="mt-7 ml-5 space-x-2 flex">
-              <Button
-                variant="destructive"
-                className="font-bold cursor-pointer"
-                type="submit"
-                disabled={loading}
-              >
-                {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Save
-              </Button>
-              <Button
-                onClick={onClose}
-                variant="secondary"
-                className="font-bold cursor-pointer"
-                type="button"
-                disabled={loading}
-              >
-                Cancel
-              </Button>
+                    {avatar && (
+                      <Button
+                        variant="destructive"
+                        size="icon"
+                        type="button"
+                        className="h-9 w-9 cursor-pointer"
+                        disabled={loading}
+                        onClick={() => setAvatar(null)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    )}
+                  </div>
+                </div>
+
+                <div className="border-t my-4" />
+
+                {/* Permissions Section */}
+                <div>
+                  <h3 className="font-medium mb-3 text-sm text-muted-foreground uppercase tracking-wider">
+                    Permissions
+                  </h3>
+                  <div className="space-y-3 bg-muted/30 p-4 rounded-lg border">
+                    {permissionsList.map((perm) => (
+                      <div key={perm.value} className="flex items-center space-x-3">
+                        <Checkbox
+                          className="border-red-700 data-[state=checked]:bg-red-600 data-[state=checked]:border-red-600 data-[state=checked]:hover:bg-red-700 data-[state=checked]:focus:ring-red-500"
+                          id={perm.value}
+                          checked={permissions.includes(perm.value)}
+                          disabled={loading}
+                          onCheckedChange={(checked) =>
+                            handlePermissionChange(perm.value, checked === true)
+                          }
+                        />
+                        <Label 
+                          htmlFor={perm.value} 
+                          className="text-sm font-normal cursor-pointer select-none"
+                        >
+                          {perm.label}
+                        </Label>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="mt-auto pt-8 flex gap-3">
+                  <Button
+                    variant="destructive"
+                    className="flex-1 font-bold cursor-pointer"
+                    type="submit"
+                    disabled={loading}
+                  >
+                    {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    Save
+                  </Button>
+                  <Button
+                    onClick={onClose}
+                    variant="outline"
+                    className="flex-1 font-bold cursor-pointer"
+                    type="button"
+                    disabled={loading}
+                  >
+                    Cancel
+                  </Button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </form>
     </div>
   );
-}
+};
