@@ -188,7 +188,7 @@ export default function UsersList() {
               >
                 <div className="flex justify-center items-center space-x-2 py-15">
                   <Spinner />
-                  <span>Loading users...</span>
+                  <span className="font-bold">Loading users...</span>
                 </div>
               </TableCell>
             </TableRow>

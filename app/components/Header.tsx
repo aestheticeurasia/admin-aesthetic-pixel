@@ -8,7 +8,7 @@ import { useAuth } from "../context/auth";
 export default function Header() {
   const {auth, setAuth} = useAuth();
   return (
-    <header className="w-full py-2 fixed z-50 bg-white dark:bg-black border-b border-muted-foreground/10 top-0">
+    <header className="w-full py-2 fixed z-50 dark-[#18181b] border-b border-muted-foreground/10 top-0">
       <div className="container mx-auto flex items-center justify-between px-4 h-auto">
         <Link href="/" className="shrink-0">
           <Image

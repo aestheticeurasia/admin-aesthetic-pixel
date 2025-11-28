@@ -180,6 +180,8 @@ export default function BlogPage() {
           </Card>
         ))}
       </section>
+
+      {/* Recent Post */}
       <section>
         <div>
           <div className="grid grid-cols-1 lg:grid-cols-3 sm:grid-cols-1 gap-8">
@@ -198,22 +200,28 @@ export default function BlogPage() {
               <CardContent>
                 {recentPosts.map((post, index) => (
                   <div
-                    className="border p-3 mx-2 my-5 rounded-lg shadow-sm flex justify-between items-center dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+                    className="border p-3 mx-2 mb-5 rounded-lg shadow-sm flex justify-between items-center dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer"
                     key={index}
                   >
                     <div className="flex flex-col gap-2">
                       <h1 className="font-bold">{post?.title}</h1>
                       <p className="text-sm text-gray-500 flex gap-4">
                         <span className="flex items-center gap-1">
-                          <Clock size={16} /> {post?.date}
+                          <Clock className="dark:text-white font-extrabold" size={16} /> {post?.date}
                         </span>
                         <span className="flex items-center gap-1">
-                          <Eye size={18} /> Views: {post?.views}
+                          <Eye className="dark:text-white font-extrabold" size={18} /> Views: {post?.views}
                         </span>
                       </p>
                     </div>
                     <div className="flex gap-2">
-                      <Badge className="bg-red-200 text-red-800 rounded-md font-bold">
+                      <Badge
+                        className={`
+    capitalize
+    ${post?.status === "Published" ? "bg-green-700 font-bold text-white" : ""}
+    ${post?.status === "Unpublished" ? "bg-red-500 font-bold text-white" : ""}
+  `}
+                      >
                         {post?.status}
                       </Badge>
                       <DropdownMenu>

@@ -38,13 +38,13 @@ export function AppSidebar() {
   };
 
   return (
-    <Sidebar className="fixed left-0 top-25 w-64 h-[calc(100vh-90px)]">
+    <Sidebar className="fixed top-30 h-[calc(100vh-90px)]">
       {/* Dashboard */}
-      <SidebarHeader>
-        <div className="mt-10">
+      <SidebarHeader className="mb-2 mt-3">
+        <div className="">
           <Link href="/dashboard">
             <div
-              className={`flex items-center px-2 gap-2 font-bold cursor-pointer ${
+              className={`flex items-center gap-2 font-bold cursor-pointer ${
                 pathname.startsWith("/dashboard") ? activeClass : inactiveClass
               }`}
             >
@@ -56,7 +56,7 @@ export function AppSidebar() {
       </SidebarHeader>
 
       {/* Content */}
-      <SidebarContent className="px-3 space-y-3">
+      <SidebarContent className="px-3 ">
         <div className="space-y-3">
           <Link href="/blog">
             <div
@@ -80,7 +80,7 @@ export function AppSidebar() {
                       : "text-muted-foreground"
                   }`}
                 >
-                  <CirclePlus className="w-4 h-4" />
+                  <CirclePlus className="w-4 h-4 dark:text-white" />
                   Create New Post
                 </div>
               </Link>
@@ -96,7 +96,7 @@ export function AppSidebar() {
                       : "text-muted-foreground"
                   }`}
                 >
-                  <SquarePen className="w-4 h-4" />
+                  <SquarePen className="w-4 h-4 dark:text-white" />
                   Existing Posts
                 </span>
               </Link>
@@ -105,7 +105,7 @@ export function AppSidebar() {
         </div>
 
         {/* Category */}
-        <div className="space-y-3 mt-4">
+        <div className="">
           <Link href="/category">
             <div
               className={`flex items-center gap-3 font-bold cursor-pointer my-1 ${
@@ -127,7 +127,7 @@ export function AppSidebar() {
                       : "text-muted-foreground"
                   }`}
                 >
-                  <CirclePlus className="w-4 h-4" />
+                  <CirclePlus className="w-4 h-4 dark:text-white" />
                   Add Category
                 </span>
               </Link>
@@ -143,7 +143,7 @@ export function AppSidebar() {
                       : "text-muted-foreground"
                   }`}
                 >
-                  <SquarePen className="w-4 h-4" />
+                  <SquarePen className="w-4 h-4 dark:text-white" />
                   Preview
                 </span>
               </Link>
@@ -152,7 +152,7 @@ export function AppSidebar() {
         </div>
 
         {/* Users */}
-        <div className="space-y-3 mt-4">
+        <div className="">
           <Link href="/users">
             <div
               className={`flex items-center gap-3 font-bold cursor-pointer my-1 ${
@@ -185,7 +185,7 @@ export function AppSidebar() {
         {/* Settings */}
         <Link href="/settings">
           <div
-            className={`flex items-center gap-3 font-bold mt-5 cursor-pointer ${
+            className={`flex items-center gap-3 font-bold cursor-pointer ${
               pathname === "/settings" ? activeClass : inactiveClass
             }`}
           >
@@ -197,7 +197,7 @@ export function AppSidebar() {
         {/* Profile */}
         <Link href="/profile">
           <div
-            className={`flex items-center gap-3 font-bold mt-4 cursor-pointer ${
+            className={`flex items-center gap-3 font-bold  cursor-pointer ${
               pathname === "/profile" ? activeClass : inactiveClass
             }`}
           >
@@ -207,10 +207,10 @@ export function AppSidebar() {
         </Link>
       </SidebarContent>
 
-      <SidebarFooter className="flex mb-10 ms-5">
+      <SidebarFooter className="flex mb-5">
         <button
           onClick={handleLogout}
-          className="flex items-center gap-3 font-bold mt-4 cursor-pointer hover:bg-red-700 rounded-md py-2 px-5 hover:text-white"
+          className="flex items-center gap-2 font-bold cursor-pointer hover:bg-red-700 rounded-md hover:text-white py-2 my-2 justify-center"
         >
           <CirclePower className="w-4 h-4" /> Logout
         </button>
