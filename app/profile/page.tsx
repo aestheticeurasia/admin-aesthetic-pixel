@@ -1,13 +1,23 @@
 "use client";
 
 import React, { useState } from "react";
-import { Mail, Phone, User, Award, Trash2, UploadCloud } from "lucide-react";
+import {
+  Mail,
+  Phone,
+  User,
+  Award,
+  Trash2,
+  UploadCloud,
+  CalendarDays,
+  Clock,
+} from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -19,7 +29,7 @@ import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
 import { useAuth } from "../context/auth";
 import dayjs from "dayjs";
-import relativeTime from 'dayjs/plugin/relativeTime';
+import relativeTime from "dayjs/plugin/relativeTime";
 
 dayjs.extend(relativeTime);
 
@@ -41,8 +51,8 @@ export default function Profile() {
         </div>
 
         <div className="grid gap-6 md:grid-cols-12">
-          <Card className="md:col-span-12 lg:col-span-4 h-fit border-border/50 shadow-sm">
-            <CardHeader>
+          <Card className="md:col-span-12 lg:col-span-4 h-fit border-border/50 shadow-sm overflow-hidden">
+            <CardHeader className="space-y-1">
               <CardTitle className="text-lg font-semibold">
                 Profile Information
               </CardTitle>
@@ -50,7 +60,9 @@ export default function Profile() {
                 Personal details are managed by your administrator.
               </CardDescription>
             </CardHeader>
-            <CardContent>
+
+            <CardContent className="pb-6">
+              {/* Avatar Section */}
               <div className="flex flex-col items-center justify-center mb-8">
                 <div className="relative w-32 h-32 rounded-full overflow-hidden border-4 border-muted shadow-sm mb-4 bg-muted">
                   <Image
@@ -106,6 +118,7 @@ export default function Profile() {
 
               <Separator className="my-6" />
 
+              {/* User Details Grid */}
               <div className="space-y-5">
                 {/* Full Name */}
                 <div className="flex items-start space-x-3">
@@ -115,7 +128,7 @@ export default function Profile() {
                       Full Name
                     </p>
                     <p className="text-base font-medium text-foreground">
-                      {auth?.user?.name}{" "}
+                      {auth?.user?.name}
                     </p>
                   </div>
                 </div>
@@ -145,6 +158,7 @@ export default function Profile() {
                     </p>
                   </div>
                 </div>
+
                 {/* Role */}
                 <div className="flex items-start space-x-3">
                   <Award className="w-5 h-5 text-muted-foreground mt-0.5" />
@@ -152,29 +166,43 @@ export default function Profile() {
                     <p className="text-sm font-medium leading-none text-muted-foreground">
                       Role
                     </p>
-                    <p className="text-base font-medium text-foreground">
+                    <div className="text-base font-medium text-foreground">
                       <Badge
-                        className={`
-    capitalize my-1
-    ${
-      auth?.user?.role === "Admin"
-        ? "bg-yellow-500 font-extrabold text-black"
-        : auth?.user?.role === "Moderator"
-        ? "bg-sky-500 font-bold text-white"
-        : "bg-gray-500 text-white"
-    }
-  `}
+                        className={`capitalize my-1 ${
+                          auth?.user?.role === "Admin"
+                            ? "bg-yellow-500 font-extrabold text-black hover:bg-yellow-400"
+                            : auth?.user?.role === "Moderator"
+                            ? "bg-sky-500 font-bold text-white hover:bg-sky-400"
+                            : "bg-gray-500 text-white hover:bg-gray-400"
+                        }`}
                       >
                         {auth?.user?.role}
                       </Badge>
-                    </p>
+                    </div>
                   </div>
-                </div>
-                <div className="text-center text-muted-foreground text-xs">
-                  Member since {dayjs(auth?.user?.createdAt).fromNow()}
                 </div>
               </div>
             </CardContent>
+
+            {/* NEW FOOTER SECTION */}
+            <CardFooter className="border-t">
+              <div className="flex w-full justify-between items-center text-xs text-muted-foreground">
+                <div className="flex items-center gap-1.5" title="Date Joined">
+                  <CalendarDays className="w-3.5 h-3.5" />
+                  <span>
+                    Joined {dayjs(auth?.user?.createdAt).format("DD MMM YYYY")}
+                  </span>
+                </div>
+
+                <div
+                  className="flex items-center gap-1.5"
+                  title="Last Profile Update"
+                >
+                  <Clock className="w-3.5 h-3.5" />
+                  <span>Updated {dayjs(auth?.user?.updatedAt).fromNow()}</span>
+                </div>
+              </div>
+            </CardFooter>
           </Card>
 
           {/* Right Column: Security & Notifications (8 cols) */}
