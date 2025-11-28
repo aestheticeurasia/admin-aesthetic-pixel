@@ -13,6 +13,7 @@ import { useAuth } from "./context/auth";
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <title>APS - Admin</title>
       <body>
         <AuthProvider>
           <RootLayoutContent>{children}</RootLayoutContent>
