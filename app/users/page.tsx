@@ -55,8 +55,14 @@ interface User {
   status: string;
   createdAt: string;
   updatedAt: string;
-  createdBy: string;
-  updatedBy: string;
+
+  createdBy: UserRef | null;
+  updatedBy: UserRef | null;
+}
+
+interface UserRef {
+  _id: string;
+  name: string;
 }
 
 interface UsersResponse {
