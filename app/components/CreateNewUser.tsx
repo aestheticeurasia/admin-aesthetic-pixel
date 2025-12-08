@@ -49,59 +49,57 @@ export default function AddNewUser({
     );
   };
 
-const handleCreate = async (e: FormEvent<HTMLFormElement>) => {
-  e.preventDefault();
-  setLoading(true);
+  const handleCreate = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setLoading(true);
 
-  const formData = new FormData();
-  formData.append("name", name);
-  formData.append("email", email);
-  formData.append("phone", phone);
-  formData.append("role", role);
-  formData.append("password", password);
-  formData.append("permissions", JSON.stringify(permissions));
+    const formData = new FormData();
+    formData.append("name", name);
+    formData.append("email", email);
+    formData.append("phone", phone);
+    formData.append("role", role);
+    formData.append("password", password);
+    formData.append("permissions", JSON.stringify(permissions));
 
-  if (avatar) {
-    formData.append("avatar", avatar); // field name matches multer
-  }
+    if (avatar) {
+      formData.append("avatar", avatar);
+    }
 
-  try {
-    const res = await axios.post(
-      `${process.env.NEXT_PUBLIC_SERVER_ADDRESS}/api/v1/auth/create-user`,
-      formData,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      }
-    );
+    try {
+      const res = await axios.post(
+        `${process.env.NEXT_PUBLIC_SERVER_ADDRESS}/api/v1/auth/create-user`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
 
-    toast.success(res.data?.message);
+      toast.success(res.data?.message);
 
-    // Reset
-    setName("");
-    setEmail("");
-    setPhone("");
-    setRole("");
-    setPassword("");
-    setAvatar(null);
-    setPermissions([]);
+      // Reset
+      setName("");
+      setEmail("");
+      setPhone("");
+      setRole("");
+      setPassword("");
+      setAvatar(null);
+      setPermissions([]);
 
-    onUserCreated?.();
-    onClose?.();
-
-  } catch (error: any) {
-    toast.error(error.response?.data?.message || "Something went wrong");
-  } finally {
-    setLoading(false);
-  }
-};
+      onUserCreated?.();
+      onClose?.();
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || "Something went wrong");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="w-full max-w-6xl mx-auto p-4 md:p-6">
       <form onSubmit={handleCreate}>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          
           {/* Left Column: Basic Information */}
           <div className="lg:col-span-2 space-y-6">
             <div className="bg-card border rounded-xl shadow-sm overflow-hidden">
@@ -110,7 +108,7 @@ const handleCreate = async (e: FormEvent<HTMLFormElement>) => {
                   Basic Information
                 </h1>
               </div>
-              
+
               <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <Label htmlFor="fullName">Full Name</Label>
@@ -160,19 +158,29 @@ const handleCreate = async (e: FormEvent<HTMLFormElement>) => {
                         className="text-xs text-muted-foreground hover:text-destructive flex items-center gap-1 transition-colors cursor-pointer"
                         disabled={loading}
                       >
-                         Clear
-                         <X className="h-3 w-3" />
+                        Clear
+                        <X className="h-3 w-3" />
                       </button>
                     )}
                   </div>
-                  <Select value={role} onValueChange={setRole} disabled={loading}>
+                  <Select
+                    value={role}
+                    onValueChange={setRole}
+                    disabled={loading}
+                  >
                     <SelectTrigger id="role" className="w-full cursor-pointer">
                       <SelectValue placeholder="Role" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="Admin" className="cursor-pointer">Admin</SelectItem>
-                      <SelectItem value="Moderator" className="cursor-pointer">Moderator</SelectItem>
-                      <SelectItem value="Viewer" className="cursor-pointer">Viewer</SelectItem>
+                      <SelectItem value="Admin" className="cursor-pointer">
+                        Admin
+                      </SelectItem>
+                      <SelectItem value="Moderator" className="cursor-pointer">
+                        Moderator
+                      </SelectItem>
+                      <SelectItem value="Viewer" className="cursor-pointer">
+                        Viewer
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -219,12 +227,9 @@ const handleCreate = async (e: FormEvent<HTMLFormElement>) => {
                       className="object-cover"
                     />
                   </div>
-                  
+
                   <div className="flex items-center gap-2">
-                    <Label
-                      htmlFor="photo-upload"
-                      className="cursor-pointer"
-                    >
+                    <Label htmlFor="photo-upload" className="cursor-pointer">
                       <div className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 px-4 py-2">
                         <UploadCloud className="w-4 h-4 mr-2" />
                         <span className="max-w-[120px] truncate">
@@ -269,7 +274,10 @@ const handleCreate = async (e: FormEvent<HTMLFormElement>) => {
                   </h3>
                   <div className="space-y-3 bg-muted/30 p-4 rounded-lg border">
                     {permissionsList.map((perm) => (
-                      <div key={perm.value} className="flex items-center space-x-3">
+                      <div
+                        key={perm.value}
+                        className="flex items-center space-x-3"
+                      >
                         <Checkbox
                           className="border-red-700 data-[state=checked]:bg-red-600 data-[state=checked]:border-red-600 data-[state=checked]:hover:bg-red-700 data-[state=checked]:focus:ring-red-500"
                           id={perm.value}
@@ -279,8 +287,8 @@ const handleCreate = async (e: FormEvent<HTMLFormElement>) => {
                             handlePermissionChange(perm.value, checked === true)
                           }
                         />
-                        <Label 
-                          htmlFor={perm.value} 
+                        <Label
+                          htmlFor={perm.value}
                           className="text-sm font-normal cursor-pointer select-none"
                         >
                           {perm.label}
@@ -298,7 +306,9 @@ const handleCreate = async (e: FormEvent<HTMLFormElement>) => {
                     type="submit"
                     disabled={loading}
                   >
-                    {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    {loading && (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    )}
                     Save
                   </Button>
                   <Button
@@ -318,4 +328,4 @@ const handleCreate = async (e: FormEvent<HTMLFormElement>) => {
       </form>
     </div>
   );
-};
+}

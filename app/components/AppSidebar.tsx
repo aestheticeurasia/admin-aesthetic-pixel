@@ -132,22 +132,6 @@ export function AppSidebar() {
                 </span>
               </Link>
             </div>
-
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-px bg-muted-foreground/30"></div>
-              <Link href="/category/preview-category">
-                <span
-                  className={`flex items-center gap-2 text-sm cursor-pointer ${
-                    pathname.startsWith("/category/preview-category")
-                      ? "text-red-600 font-bold"
-                      : "text-muted-foreground"
-                  }`}
-                >
-                  <SquarePen className="w-4 h-4 dark:text-white" />
-                  Preview
-                </span>
-              </Link>
-            </div>
           </div>
         </div>
 
