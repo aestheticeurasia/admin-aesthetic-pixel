@@ -116,23 +116,6 @@ export function AppSidebar() {
               Category
             </div>
           </Link>
-          <div className="ml-6 border-l border-muted-foreground/30 pl-4 my-1 space-y-3 mt-3">
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-px bg-muted-foreground/30"></div>
-              <Link href="/category/add-category">
-                <span
-                  className={`flex items-center gap-2 text-sm cursor-pointer ${
-                    pathname.startsWith("/category/add-category")
-                      ? "text-red-600 font-bold"
-                      : "text-muted-foreground"
-                  }`}
-                >
-                  <CirclePlus className="w-4 h-4 dark:text-white" />
-                  Add Category
-                </span>
-              </Link>
-            </div>
-          </div>
         </div>
 
         {/* Users */}

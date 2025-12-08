@@ -120,7 +120,7 @@ export default function AddCategory() {
       <Tabs defaultValue="main-category" className="w-full max-w-lg">
         <div className="mb-8 text-center space-y-2">
           <h1 className="text-3xl font-bold tracking-tight">
-            Manage Categories
+            Create Categories
           </h1>
           <p className="text-muted-foreground">
             Create new top-level categories or organize items into

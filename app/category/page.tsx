@@ -28,8 +28,8 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { Dialog, DialogContent, DialogHeader } from "@/components/ui/dialog";
-import AddCategory from "./add-category/page";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import AddCategory from "../components/AddCategory";
 
 interface ParentDetails {
   _id: string;
@@ -287,12 +287,9 @@ export default function CategoriesPage() {
         onOpenChange={setCreateCategoryModalOpen}
       >
         <DialogContent className="sm:max-w-[1100px] w-full max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <span className="text-xl font-bold">Add New Category</span>
-          </DialogHeader>
-          <AddCategory />
+          <AddCategory/>
         </DialogContent>
       </Dialog>
     </div>
   );
-}
+};
