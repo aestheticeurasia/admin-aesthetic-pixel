@@ -23,7 +23,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { useCategoryStore } from "@/store/useCategory";
 import axios from "axios";
-import { Car, FolderPlus, GitMerge, Layers, RotateCw } from "lucide-react";
+import { FolderPlus, GitMerge, Layers, RotateCw } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -76,7 +76,7 @@ export default function AddCategory() {
       setDescription("");
       setMainLoading(false);
       toast.success(data?.message);
-    } catch (error) {
+    } catch (error: any) {
       toast.error(error.response?.data?.message);
     } finally {
       setMainLoading(false);
@@ -108,7 +108,7 @@ export default function AddCategory() {
       setSubCategoryDescription("");
       setSubLoading(false);
       toast.success(data?.message);
-    } catch (error) {
+    } catch (error: any) {
       toast.error(error.response?.data?.message);
     } finally {
       setSubLoading(false);
