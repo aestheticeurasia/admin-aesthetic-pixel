@@ -27,7 +27,14 @@ import { FolderPlus, GitMerge, Layers, RotateCw } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
-export default function AddCategory() {
+interface CategoryFormProps {
+  onSuccess: () => void;
+}
+
+export default function AddCategory(
+  {
+  onSuccess,
+}: CategoryFormProps) {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [mainLoading, setMainLoading] = useState(false);
@@ -47,7 +54,7 @@ export default function AddCategory() {
   const handleRefresh = async () => {
     try {
       setRefreshing(true);
-      await fetchCategories(); // your function
+      await fetchCategories();
     } finally {
       setRefreshing(false);
     }
@@ -76,6 +83,7 @@ export default function AddCategory() {
       setDescription("");
       setMainLoading(false);
       toast.success(data?.message);
+      onSuccess(); 
     } catch (error: any) {
       toast.error(error.response?.data?.message);
     } finally {
@@ -83,7 +91,7 @@ export default function AddCategory() {
     }
   };
 
-  //create category handler
+  //create subcategory handler
   const handleCreateSubCategory = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubLoading(true);
@@ -108,6 +116,7 @@ export default function AddCategory() {
       setSubCategoryDescription("");
       setSubLoading(false);
       toast.success(data?.message);
+      onSuccess();
     } catch (error: any) {
       toast.error(error.response?.data?.message);
     } finally {
@@ -116,8 +125,16 @@ export default function AddCategory() {
   };
 
   return (
-    <div className="container mx-auto flex items-center justify-center py-10 px-4">
-      <Tabs defaultValue="main-category" className="w-full max-w-lg">
+    <div>
+      <Tabs
+        defaultValue="main-category"
+        className="w-full max-w-lg"
+        onValueChange={(value) => {
+          if (value === "subcategory") {
+            handleRefresh();
+          }
+        }}
+      >
         <div className="mb-8 text-center space-y-2">
           <h1 className="text-3xl font-bold tracking-tight">
             Create Categories
@@ -196,7 +213,7 @@ export default function AddCategory() {
         </TabsContent>
 
         {/* --- Subcategory --- */}
-        <TabsContent value="subcategory">
+        <TabsContent value="subcategory" onClick={handleRefresh}>
           <Card>
             <CardHeader>
               <CardTitle>Add Subcategory</CardTitle>

@@ -100,8 +100,6 @@ export default function UsersList() {
 
   // delete user
   const handleDeleteUser = async () => {
-    if (!userToDelete) return;
-
     try {
       setDeleteLoading(true);
       const { data } = await axios.delete<UsersResponse>(
@@ -114,15 +112,8 @@ export default function UsersList() {
       } else {
         toast.error(data.message);
       }
-    } catch (error: unknown) {
-      if (axios.isAxiosError(error) && error.response) {
-        const errorMessage =
-          error.response.data.message || "Something went wrong";
-        toast.error(errorMessage);
-      } else {
-        console.error(error);
-        toast.error("Something went wrong");
-      }
+    } catch (error: any) {
+      toast.error(error.message);
     } finally {
       setDeleteLoading(false);
     }
@@ -320,6 +311,7 @@ export default function UsersList() {
         </TableBody>
       </Table>
 
+      {/* Add user modal */}
       <Dialog open={updateUserModalOpen} onOpenChange={setUpdateUserModalOpen}>
         <DialogContent className="sm:max-w-[1100px] w-full max-h-[90vh] overflow-y-auto">
           <DialogHeader>
@@ -339,6 +331,7 @@ export default function UsersList() {
         </DialogContent>
       </Dialog>
 
+      {/* User Delete Alert */}
       <AlertDialog
         open={!!userToDelete}
         onOpenChange={(open) => !open && setUserToDelete(null)}
