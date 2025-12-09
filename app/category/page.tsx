@@ -323,7 +323,7 @@ export default function CategoryTable() {
                               by {sub?.updatedBy?.name}
                             </TableCell>
 
-                            <TableCell className="text-right space-x-2">
+                            <TableCell className="text-center space-x-2">
                               <Button
                                 variant="ghost"
                                 size="sm"
@@ -393,7 +393,10 @@ export default function CategoryTable() {
       </Dialog>
 
       {/* Update Sub-Category Modal */}
-      <Dialog open={updateSubCategoryModalOpen}>
+      <Dialog
+        open={updateSubCategoryModalOpen}
+        onOpenChange={setUpdateSubCategoryModalOpen}
+      >
         <DialogContent
           onOpenAutoFocus={(e) => e.preventDefault()}
           className="overflow-y-auto dark:bg-gray-900"
