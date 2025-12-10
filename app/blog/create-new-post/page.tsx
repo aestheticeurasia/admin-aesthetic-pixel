@@ -17,7 +17,9 @@ import { useCategoryStore } from "@/store/useCategory";
 import { useSubCategoryStore } from "@/store/useSubCategory";
 import { CloudUpload } from "lucide-react";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import JoditEditor from "jodit-react";
+import { Button } from "@/components/ui/button";
 
 export default function CreateNewPost() {
   const [coverPhoto, setCoverPhoto] = useState<File | null>(null);
@@ -29,6 +31,24 @@ export default function CreateNewPost() {
     loading: subLoading,
   } = useSubCategoryStore();
   const [parentCategory, setParentCategory] = useState("");
+  const editor = useRef(null);
+  const [content, setContent] = useState("");
+
+  // prevent re-rendering issues
+  const config = useMemo(
+    () => ({
+      readonly: false,
+      height: 400,
+      uploader: {
+        insertImageAsBase64URI: false,
+        url: "/api/upload-editor-file",
+        method: "POST",
+      },
+      removeButtons: ["about"],
+    }),
+    []
+  );
+
   const handleCoverPhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -36,10 +56,10 @@ export default function CreateNewPost() {
     setCoverPhoto(file);
     setPreviewUrl(URL.createObjectURL(file));
   };
-  
- const filteredSubs = subCategories.filter(
-  (sub) => (sub.parentCategory as any)?._id === parentCategory
-);
+
+  const filteredSubs = subCategories.filter(
+    (sub) => (sub.parentCategory as any)?._id === parentCategory
+  );
 
   useEffect(() => {
     if (categories.length === 0) fetchCategories();
@@ -219,7 +239,25 @@ export default function CreateNewPost() {
             onChange={handleCoverPhotoChange}
           />
         </div>
-        <div></div>
+        <div className="mt-10">
+          <Label htmlFor="blogText" className="text-2xl font-bold my-3">
+            Blog Text
+          </Label>
+          <JoditEditor
+            name="blogText"
+            ref={editor}
+            value={content}
+            config={config}
+            onChange={(newContent) => {
+              setContent(newContent);
+              // onChange?.(newContent);
+            }}
+          />
+        </div>
+
+        <Button className="mt-10 mb-20 w-full md:w-auto px-10 py-4">
+          Publish Post
+        </Button>
       </form>
     </div>
   );
