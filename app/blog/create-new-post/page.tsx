@@ -20,6 +20,7 @@ import Image from "next/image";
 import { useEffect, useMemo, useRef, useState } from "react";
 import JoditEditor from "jodit-react";
 import { Button } from "@/components/ui/button";
+import BlockEditor from "@/app/components/BlockNoteEditor";
 
 export default function CreateNewPost() {
   const [coverPhoto, setCoverPhoto] = useState<File | null>(null);
@@ -35,19 +36,19 @@ export default function CreateNewPost() {
   const [content, setContent] = useState("");
 
   // prevent re-rendering issues
-  const config = useMemo(
-    () => ({
-      readonly: false,
-      height: 400,
-      uploader: {
-        insertImageAsBase64URI: false,
-        url: "/api/upload-editor-file",
-        method: "POST",
-      },
-      removeButtons: ["about"],
-    }),
-    []
-  );
+  // const config = useMemo(
+  //   () => ({
+  //     readonly: false,
+  //     height: 400,
+  //     uploader: {
+  //       insertImageAsBase64URI: false,
+  //       url: "/api/upload-editor-file",
+  //       method: "POST",
+  //     },
+  //     removeButtons: ["about"],
+  //   }),
+  //   []
+  // );
 
   const handleCoverPhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -243,7 +244,7 @@ export default function CreateNewPost() {
           <Label htmlFor="blogText" className="text-2xl font-bold my-3">
             Blog Text
           </Label>
-          <JoditEditor
+          {/* <JoditEditor
             name="blogText"
             ref={editor}
             value={content}
@@ -252,10 +253,16 @@ export default function CreateNewPost() {
               setContent(newContent);
               // onChange?.(newContent);
             }}
-          />
+          /> */}
+          <div className="border rounded-md p-2 bg-white dark:bg-neutral-900 min-h-[300px]">
+            <BlockEditor value={""} onChange={setContent} />
+          </div>
         </div>
 
-        <Button className="mt-10 mb-20 w-full md:w-auto px-10 py-4">
+        <Button
+          variant="destructive"
+          className="mt-10 mb-20 w-full md:w-auto px-10 py-4 cursor-pointer"
+        >
           Publish Post
         </Button>
       </form>
