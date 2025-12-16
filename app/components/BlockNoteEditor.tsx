@@ -1,8 +1,9 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { useCreateBlockNote } from "@blocknote/react";
 import { BlockNoteView } from "@blocknote/mantine";
+import { useTheme } from "next-themes";
 
 import "@blocknote/core/fonts/inter.css";
 import "@blocknote/mantine/style.css";
@@ -13,22 +14,26 @@ interface BlockEditorProps {
 }
 
 export default function BlockEditor({ value, onChange }: BlockEditorProps) {
-  // Create editor instance once
+  const { resolvedTheme } = useTheme();
+
   const editor = useCreateBlockNote({
     initialContent: value ? JSON.parse(value) : undefined,
   });
 
-  // Called whenever content changes
   const handleChange = useCallback(() => {
-    const json = JSON.stringify(editor.document);
-    onChange(json);
+    onChange(JSON.stringify(editor.document));
   }, [editor, onChange]);
 
+  // ✅ Resolve theme properly
+  const blockNoteTheme = useMemo<"light" | "dark">(() => {
+    return resolvedTheme === "dark" ? "dark" : "light";
+  }, [resolvedTheme]);
+
   return (
-    <div className="dark:bg-neutral-900">
+    <div className="bg-background">
       <BlockNoteView
         editor={editor}
-        theme="light"
+        theme={blockNoteTheme}
         onChange={handleChange}
       />
     </div>
