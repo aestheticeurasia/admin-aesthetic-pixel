@@ -149,20 +149,12 @@ export default function Login() {
                     </div>
 
                     <div className="grid gap-2">
-                      <div className="flex items-center justify-between">
-                        <Label
-                          htmlFor="password"
-                          className="text-gray-700 dark:text-gray-300"
-                        >
-                          Password
-                        </Label>
-                        <Link
-                          href="#"
-                          className="text-sm font-medium text-red-600 dark:text-red-500 hover:text-red-500 hover:underline"
-                        >
-                          Forgot password?
-                        </Link>
-                      </div>
+                      <Label
+                        htmlFor="password"
+                        className="text-gray-700 dark:text-gray-300"
+                      >
+                        Password
+                      </Label>
                       <Input
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
@@ -173,10 +165,18 @@ export default function Login() {
                         required
                       />
                     </div>
+                    <div className="flex items-center justify-end">
+                      <Link
+                        href="#"
+                        className="text-sm font-medium text-red-600 dark:text-red-500 hover:text-red-500 hover:underline"
+                      >
+                        Forgot password?
+                      </Link>
+                    </div>
                   </div>
                 </CardContent>
 
-                <CardFooter className="flex flex-col gap-4 pt-2 mb-3">
+                <CardFooter className="flex flex-col gap-4">
                   <Button
                     variant="default"
                     type="submit"
