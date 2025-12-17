@@ -80,7 +80,7 @@ export default function ExistingPost() {
     setDeleteLoading(false);
     try {
     } catch (error: any) {
-      toast.error(error.response?.data?.message);
+      toast.error(error?.data?.message);
       setDeleteLoading(false);
     }
   };
@@ -132,7 +132,7 @@ export default function ExistingPost() {
                 >
                   <div className="flex justify-center items-center space-x-2 py-15">
                     <Spinner />
-                    <span>Loading users...</span>
+                    <span>Loading blogs...</span>
                   </div>
                 </TableCell>
               </TableRow>
