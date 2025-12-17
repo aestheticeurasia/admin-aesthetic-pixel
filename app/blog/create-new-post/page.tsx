@@ -18,7 +18,7 @@ import { useCategoryStore } from "@/store/useCategory";
 import { useSubCategoryStore } from "@/store/useSubCategory";
 import { CalendarDays, CloudUpload } from "lucide-react";
 import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import BlockEditor from "@/app/components/BlockNoteEditor";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -27,12 +27,27 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import dayjs from "dayjs";
+import axios from "axios";
+import { toast } from "sonner";
+import { Spinner } from "@/components/ui/spinner";
 
 export default function CreateNewPost() {
+  const [createLoading, setCreateLoading] = useState(false);
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
+  const [category, setCategory] = useState("");
+  const [subCategory, setSubCategory] = useState("");
+  const [tag, setTag] = useState("");
   const [coverPhoto, setCoverPhoto] = useState<File | null>(null);
+  const [metaDescription, setMetaDescription] = useState("");
+  const [excerpt, setExcerpt] = useState("");
+  const [status, setStatus] = useState("Draft");
+  // Unified date state
+  const [date, setDate] = useState<Date | undefined>(new Date());
+
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
-  const [date, setDate] = useState<Date | undefined>(new Date());
+
   const { categories, fetchCategories, loading } = useCategoryStore();
   const {
     subCategories,
@@ -40,7 +55,6 @@ export default function CreateNewPost() {
     loading: subLoading,
   } = useSubCategoryStore();
   const [parentCategory, setParentCategory] = useState("");
-  const [content, setContent] = useState("");
 
   const handleCoverPhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -59,9 +73,56 @@ export default function CreateNewPost() {
     if (subCategories.length === 0) fetchSubCategories();
   }, []);
 
+  //create blog
+  const handleCreateBlog = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setCreateLoading(true);
+    const formData = new FormData();
+    formData.append("title", title);
+    formData.append("jsonContent", content);
+    formData.append("category", category);
+    formData.append("subCategory", subCategory);
+    if (coverPhoto) formData.append("coverPhoto", coverPhoto);
+    formData.append("metaDescription", metaDescription);
+    formData.append("excerpt", excerpt);
+    formData.append("status", status);
+    if (date) formData.append("publishedAt", date.toISOString());
+
+    try {
+      const res = await axios.post(
+        `${process.env.NEXT_PUBLIC_SERVER_ADDRESS}/api/v1/blog/create-blog`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      //reset form
+      setTitle("");
+      setContent(null);
+      setCategory(null);
+      setSubCategory("");
+      setCoverPhoto(null);
+      setPreviewUrl(null);
+      setMetaDescription("");
+      setExcerpt("");
+      setStatus("Draft");
+      setDate(null);
+      toast.success(res.data?.message);
+    } catch (error: any) {
+      console.error(error);
+      toast.error(error.response?.data?.message);
+    } finally {
+      setCreateLoading(false);
+    }
+  };
+
+
   return (
     <div className="container">
-      <form onSubmit={(e) => e.preventDefault()}>
+      <form onSubmit={handleCreateBlog}>
         <div className="flex justify-between items-center p-5">
           <h1 className="text-3xl font-bold mb-5">Create New Post</h1>
           <div>
@@ -69,7 +130,9 @@ export default function CreateNewPost() {
               type="submit"
               className="cursor-pointer"
               variant="destructive"
+              disabled={createLoading}
             >
+              {createLoading && <Spinner />}
               Save
             </Button>
           </div>
@@ -84,6 +147,8 @@ export default function CreateNewPost() {
                 type="text"
                 id="title"
                 name="title"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
                 placeholder="Post Title"
                 className="h-11 bg-[#f6f7f9] font-bold text-xl"
                 required
@@ -94,7 +159,7 @@ export default function CreateNewPost() {
                 Post Content
               </Label>
               <div className="border-2 rounded-md p-2 dark:bg-neutral-900 min-h-[500px]">
-                <BlockEditor value={""} onChange={setContent} />
+                <BlockEditor value={content} onChange={setContent} />
               </div>
             </div>
           </section>
@@ -110,7 +175,12 @@ export default function CreateNewPost() {
 
                 <Select
                   name="mainCategory"
-                  onValueChange={(value) => setParentCategory(value)}
+                  value={parentCategory}
+                  onValueChange={(value) => {
+                    setParentCategory(value);
+                    setCategory(value);
+                    setSubCategory("");
+                  }}
                 >
                   <SelectTrigger className="w-full bg-[#f6f7f9] py-6 mt-2">
                     <SelectValue placeholder="Select main category" />
@@ -134,7 +204,12 @@ export default function CreateNewPost() {
               <div className="w-full mt-5">
                 <Label htmlFor="subCategory">Sub Category</Label>
 
-                <Select name="subCategory" disabled={!parentCategory}>
+                <Select
+                  name="subCategory"
+                  disabled={!parentCategory}
+                  value={subCategory}
+                  onValueChange={(value) => setSubCategory(value)}
+                >
                   <SelectTrigger className="w-full bg-[#f6f7f9] py-6 mt-2">
                     <SelectValue
                       placeholder={
@@ -166,22 +241,24 @@ export default function CreateNewPost() {
                   </SelectContent>
                 </Select>
               </div>
-              <div className="space-y-3 mt-5">
+              {/* <div className="space-y-3 mt-5">
                 <Label htmlFor="tag">Tag</Label>
                 <Input
                   type="text"
                   id="tag"
                   name="tag"
+                  value={tag}
+                  onChange={(e) => setTag(e.target.value)}
                   placeholder="Post Tag"
                   className="h-11 bg-[#f6f7f9]"
                   required
                 />
-              </div>
+              </div> */}
             </div>
 
             {/* Cover Photo */}
             <div className="border-2 p-4 mt-5 rounded-md">
-              <div className="">
+              <div>
                 <Label htmlFor="coverPhoto" className="text-lg font-bold pb-2">
                   Cover Photo
                 </Label>
@@ -238,6 +315,8 @@ export default function CreateNewPost() {
                   placeholder="Meta Description"
                   className="bg-[#f6f7f9] mt-2"
                   rows={6}
+                  value={metaDescription}
+                  onChange={(e) => setMetaDescription(e.target.value)}
                 />
               </div>
               <div className=" mt-2">
@@ -249,6 +328,8 @@ export default function CreateNewPost() {
                   placeholder="Those text will show on the card"
                   className="bg-[#f6f7f9] mt-2"
                   rows={6}
+                  value={excerpt}
+                  onChange={(e) => setExcerpt(e.target.value)}
                 />
               </div>
             </div>
@@ -258,10 +339,14 @@ export default function CreateNewPost() {
               <h1 className="text-xl font-bold pb-2 border-b-2">Publishing</h1>
               <div className="mt-5 space-y-3">
                 <Label htmlFor="metaDescription">Status</Label>
-                <RadioGroup defaultValue="Draft">
+                <RadioGroup
+                  defaultValue="Draft"
+                  onValueChange={setStatus}
+                  value={status}
+                >
                   <div className="flex items-center gap-3 py-2">
                     <RadioGroupItem
-                      value="draft"
+                      value="Draft"
                       id="r1"
                       className="cursor-pointer "
                     />
@@ -271,7 +356,7 @@ export default function CreateNewPost() {
                   </div>
                   <div className="flex items-center gap-3 py-2">
                     <RadioGroupItem
-                      value="published"
+                      value="Published"
                       id="r2"
                       className="cursor-pointer"
                     />

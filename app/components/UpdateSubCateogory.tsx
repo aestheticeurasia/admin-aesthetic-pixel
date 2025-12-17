@@ -20,11 +20,14 @@ import { toast } from "sonner";
 import { useCategoryStore } from "@/store/useCategory";
 
 interface CategoryFormProps {
-  category: any; 
+  category: any;
   onSuccess: () => void;
 }
 
-export default function UpdateSubCategory({ category, onSuccess }: CategoryFormProps) {
+export default function UpdateSubCategory({
+  category,
+  onSuccess,
+}: CategoryFormProps) {
   const [name, setName] = useState("");
   const [slug, setSlug] = useState("");
   const [description, setDescription] = useState("");
@@ -77,13 +80,14 @@ export default function UpdateSubCategory({ category, onSuccess }: CategoryFormP
   return (
     <div>
       <div className="mb-8 text-center space-y-2">
-        <h1 className="text-3xl font-bold tracking-tight">Update Sub-Category</h1>
+        <h1 className="text-3xl font-bold tracking-tight">
+          Update Sub-Category
+        </h1>
       </div>
 
       <Card>
         <form onSubmit={handleUpdateSubCategory}>
           <CardContent className="space-y-4">
-            
             {/* Parent Category */}
             <div className="space-y-2">
               <Label htmlFor="parent-category">Parent Category</Label>
@@ -92,7 +96,10 @@ export default function UpdateSubCategory({ category, onSuccess }: CategoryFormP
                 onValueChange={(value) => setParentCategory(value)}
                 required
               >
-                <SelectTrigger id="parent-category" className="cursor-pointer w-full">
+                <SelectTrigger
+                  id="parent-category"
+                  className="cursor-pointer w-full"
+                >
                   <SelectValue placeholder="Select a parent..." />
                 </SelectTrigger>
 
@@ -138,9 +145,10 @@ export default function UpdateSubCategory({ category, onSuccess }: CategoryFormP
             <div className="space-y-2">
               <Label htmlFor="sub-description">Description</Label>
               <Textarea
+                wrap="hard"
                 id="sub-description"
                 placeholder="Describe this sub-category..."
-                className="min-h-[100px]"
+                className="min-h-[100px] resize-y overflow-x-hidden break-all"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
               />
@@ -170,4 +178,4 @@ export default function UpdateSubCategory({ category, onSuccess }: CategoryFormP
       </Card>
     </div>
   );
-};
+}

@@ -96,9 +96,10 @@ export default function UpdateCategory({
             <div className="space-y-2">
               <Label htmlFor="main-description">Description</Label>
               <Textarea
+              wrap="hard"
                 id="main-description"
                 placeholder="Describe this category..."
-                className="min-h-[100px]"
+                className="min-h-[100px]  resize-y overflow-x-hidden break-all"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
               />

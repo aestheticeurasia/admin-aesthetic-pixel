@@ -31,10 +31,7 @@ interface CategoryFormProps {
   onSuccess: () => void;
 }
 
-export default function AddCategory(
-  {
-  onSuccess,
-}: CategoryFormProps) {
+export default function AddCategory({ onSuccess }: CategoryFormProps) {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [mainLoading, setMainLoading] = useState(false);
@@ -83,7 +80,7 @@ export default function AddCategory(
       setDescription("");
       setMainLoading(false);
       toast.success(data?.message);
-      onSuccess(); 
+      onSuccess();
     } catch (error: any) {
       toast.error(error.response?.data?.message);
     } finally {
@@ -282,9 +279,10 @@ export default function AddCategory(
                 <div className="space-y-2">
                   <Label htmlFor="sub-description">Description</Label>
                   <Textarea
+                    wrap="hard"
                     id="sub-description"
                     placeholder="Describe this subcategory..."
-                    className="min-h-[100px]"
+                    className="min-h-[100px]  resize-y overflow-x-hidden break-all"
                     value={subCategoryDescription}
                     onChange={(e) => setSubCategoryDescription(e.target.value)}
                   />
