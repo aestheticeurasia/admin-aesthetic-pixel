@@ -1,5 +1,4 @@
 "use client";
-
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -47,7 +46,6 @@ export default function ExistingPost() {
   const [blogs, setBlogs] = useState<any[]>([]);
 
   //get all blog
-
   const fetchAllBlogs = async () => {
     setSpinnerLoading(true);
     try {
