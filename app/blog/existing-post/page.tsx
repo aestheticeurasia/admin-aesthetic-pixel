@@ -42,9 +42,6 @@ interface BlogResponse {
 
 export default function ExistingPost() {
   const [blogToDelete, setBlogToDelete] = useState<string | null>(null);
-  const [draftBlogToDelete, setDraftBlogToDelete] = useState<string | null>(
-    null
-  );
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [spinnerLoading, setSpinnerLoading] = useState(false);
   const [blogs, setBlogs] = useState<any[]>([]);
