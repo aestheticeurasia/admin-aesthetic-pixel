@@ -17,7 +17,7 @@ const dashboardCards = [
     icon: <Image className="h-6 w-6 text-red-500" />,
     title: "Total Photos",
     number: "1,234",
-    content: "+12% from last month",
+    content: "+15% from last month",
     iconBgColor: "bg-red-500/10",
     contentTextColor: "text-red-500",
   },
