@@ -1,166 +1,179 @@
 "use client";
 
-import { Card, CardContent } from "@/components/ui/card";
+import React, { useEffect } from "react";
 import {
-  Image,
-  NotebookPen,
-  Eye,
-  Activity,
-  Camera,
-  GalleryHorizontal,
+  CheckCircle2,
+  Clock,
+  ShoppingBag,
+  Trash2,
+  ArrowUpRight,
+  TrendingUp,
 } from "lucide-react";
-import Link from "next/link";
-import { useRef } from "react";
 
-const dashboardCards = [
-  {
-    icon: <Image className="h-6 w-6 text-red-500" />,
-    title: "Total Photos",
-    number: "1,234",
-    content: "+15% from last month",
-    iconBgColor: "bg-red-500/10",
-    contentTextColor: "text-red-500",
-  },
-  {
-    icon: <NotebookPen className="h-6 w-6 text-red-500" />,
-    title: "Blog Posts",
-    number: "42",
-    content: "+5% from last month",
-    iconBgColor: "bg-red-500/10",
-    contentTextColor: "text-red-500",
-  },
-  {
-    icon: <Eye className="h-6 w-6 text-red-500" />,
-    title: "Gallery Views",
-    number: "892",
-    content: "+23% from last month",
-    iconBgColor: "bg-red-500/10",
-    contentTextColor: "text-red-500",
-  },
-  {
-    icon: <Activity className="h-6 w-6 text-red-500" />,
-    title: "Engagement",
-    number: "64.2%",
-    content: "-8% from last month",
-    iconBgColor: "bg-red-500/10",
-    contentTextColor: "text-red-500",
-  },
-];
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useAuth } from "@/app/context/auth";
+import { toast } from "sonner";
+import axios from "axios";
+import { Bar, BarChart, Cell, XAxis, YAxis } from "recharts";
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/ui/chart";
 
-export default function AppDashboard() {
-  const fileInputRef = useRef<HTMLInputElement>(null);
+interface DashboardData {
+  pendingOrders: number;
+  acceptedOrders: number;
+  cancelledOrders: number;
+  totalOrders: number;
+}
 
-  const handleCardClick = () => {
-    fileInputRef.current?.click();
+export default function Dashboard() {
+  const { auth } = useAuth();
+  const [dashboardData, setDashboardData] = React.useState({
+    pendingOrders: 0,
+    acceptedOrders: 0,
+    cancelledOrders: 0,
+    totalOrders: 0,
+  } as DashboardData);
+  const [loading, setLoading] = React.useState<boolean>(false);
+
+  const getDashboardData = async () => {
+    try {
+      const { data } = await axios.get(
+        `${process.env.NEXT_PUBLIC_SERVER_ADDRESS}/api/v1/order/dashboard-data`
+      );
+      setDashboardData(data.data);
+      setLoading(false);
+    } catch (error: any) {
+      toast.error(error?.response?.data?.message);
+    }
   };
 
+  useEffect(() => {
+    getDashboardData();
+  }, []);
+
+  const cards = [
+    {
+      title: "Pending Orders",
+      value: dashboardData.pendingOrders,
+      icon: Clock,
+      color: "text-amber-500",
+      bgColor: "bg-amber-500/10",
+      borderColor: "hover:border-amber-500/30",
+    },
+    {
+      title: "Accepted Orders",
+      value: dashboardData.acceptedOrders,
+      icon: CheckCircle2,
+      color: "text-emerald-500",
+      bgColor: "bg-emerald-500/10",
+      borderColor: "hover:border-emerald-500/30",
+    },
+    {
+      title: "Cancelled Orders",
+      value: dashboardData.cancelledOrders,
+      icon: Trash2,
+      color: "text-red-500",
+      bgColor: "bg-red-500/10",
+      borderColor: "hover:border-red-500/30",
+    },
+    {
+      title: "Total Orders",
+      value: dashboardData.totalOrders,
+      icon: ShoppingBag,
+      color: "text-blue-500",
+      bgColor: "bg-blue-500/10",
+      borderColor: "hover:border-blue-500/30",
+    },
+  ];
+
+  const chartData = [
+    {
+      label: "Pending",
+      value: dashboardData.pendingOrders,
+      color: "#f59e0b",
+    },
+    {
+      label: "Accepted",
+      value: dashboardData.acceptedOrders,
+      color: "#22c55e",
+    },
+    {
+      label: "Cancelled",
+      value: dashboardData.cancelledOrders,
+      color: "#ef4444",
+    },
+    {
+      label: "Total",
+      value: dashboardData.totalOrders,
+      color: "#3b82f6",
+    },
+  ];
+
   return (
-    <div className="mx-0 md:mx-20">
-      {/* Dashboard Cards Section */}
-      <section className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:py-10">
-        {dashboardCards.map((card, index) => (
+    <div className="min-h-screen py-5 lg:p-8 dark:bg-[#0a0a0b] text-slate-50">
+
+      {/* Stats Grid */}
+      <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-6">
+        {cards.map((card) => (
           <Card
-            key={index}
-            className="p-0 rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700"
+            key={card.title}
+            className={`relative overflow-hidden border-slate-800/60  backdrop-blur-md transition-all duration-300 ${card.borderColor} group`}
           >
-            <CardContent className="flex flex-col gap-2 p-4">
-              <div className="flex justify-between items-center">
-                <h3 className="text-sm font-medium text-gray-700 dark:text-gray-200">
-                  {card.title}
-                </h3>
-                <div className={`p-2 rounded-lg ${card.iconBgColor}`}>
-                  {card.icon}
-                </div>
-              </div>
-
-              <p className="text-4xl font-bold text-gray-900 dark:text-gray-100 mt-2">
-                {card.number}
-              </p>
-
-              <p
-                className={`text-sm ${card.contentTextColor} dark:text-red-400`}
+            <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+              <CardTitle className="dark:text-slate-400 group-hover:text-slate-200 transition-colors">
+                {card.title}
+              </CardTitle>
+              <div
+                className={`p-2 rounded-xl transition-colors ${card.bgColor}`}
               >
-                {card.content}
-              </p>
+                <card.icon className={`w-4 h-4 ${card.color}`} />
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-baseline justify-between mt-1">
+                <div className="text-4xl font-bold dark:text-white tabular-nums text-end lg:text-start">
+                  {card.value}
+                </div>
+                <ArrowUpRight className="w-4 h-4 text-slate-600 opacity-0 group-hover:opacity-100 transition-opacity" />
+              </div>
             </CardContent>
+            {/* Subtle bottom gradient accent */}
+            <div
+              className={`absolute bottom-0 left-0 h-0.5 w-0 group-hover:w-full transition-all duration-500 ${card.color.replace(
+                "text",
+                "bg"
+              )}`}
+            />
           </Card>
         ))}
-      </section>
+      </div>
 
-      {/* Quick Actions Section */}
-      <section className="mt-10">
-        <div className="ms-10 text-center md:text-start">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-            Quick Actions
-          </h2>
-          <p className="text-gray-600 dark:text-gray-300 mb-6">
-            Start creating and managing your content
-          </p>
+      {/* Activity Chart Placeholder */}
+      <div className="mt-8">
+        <div className="lg:h-100 rounded-2xl border border-slate-800/50 bg-[#171717] backdrop-blur-sm lg:p-6 py-5 pr-10">
+          <ChartContainer
+            config={{
+              value: { label: "Orders" },
+            }}
+            className="h-full w-full"
+          >
+            <BarChart data={chartData}>
+              <XAxis dataKey="label" />
+              <YAxis allowDecimals={false} />
+              <ChartTooltip content={<ChartTooltipContent />} />
+
+              <Bar dataKey="value" radius={6}>
+                {chartData.map((entry, index) => (
+                  <Cell key={index} fill={entry.color} />
+                ))}
+              </Bar>
+            </BarChart>
+          </ChartContainer>
         </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          <Link href="/blog/new-post">
-            <Card className="p-0 border-2 border-gray-200 dark:border-gray-700 shadow-none rounded-lg hover:shadow-md transition-shadow cursor-pointer bg-white dark:bg-gray-800">
-              <CardContent className="flex flex-col gap-3 p-6">
-                <div className="p-2 rounded-lg bg-red-500/10 self-start">
-                  <Camera className="h-6 w-6 text-red-500" />
-                </div>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mt-2">
-                  Write New Post
-                </h3>
-                <p className="text-sm text-gray-600 dark:text-gray-300">
-                  Share your latest photography story
-                </p>
-              </CardContent>
-            </Card>
-          </Link>
-
-          {/* View Blog Card */}
-          <Link href="/blog">
-            <Card className="p-0 border-2 border-gray-200 dark:border-gray-700 shadow-none rounded-lg hover:shadow-md transition-shadow cursor-pointer bg-white dark:bg-gray-800">
-              <CardContent className="flex flex-col gap-3 p-6">
-                <div className="p-2 rounded-lg bg-red-500/10 self-start">
-                  <GalleryHorizontal className="h-6 w-6 text-red-500" />
-                </div>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mt-2">
-                  View Blog
-                </h3>
-                <p className="text-sm text-gray-600 dark:text-gray-300">
-                  Browse all your published posts
-                </p>
-              </CardContent>
-            </Card>
-          </Link>
-
-          {/* Upload Photos Card */}
-          <div>
-            <input
-              type="file"
-              ref={fileInputRef} // <- Linked to the ref
-              className="hidden"
-              multiple
-              accept="image/*"
-            />
-
-            <Card
-              onClick={handleCardClick} // <- Added click handler
-              className="p-0 border-2 border-gray-200 dark:border-gray-700 shadow-none rounded-lg hover:shadow-md transition-shadow cursor-pointer bg-white dark:bg-gray-800"
-            >
-              <CardContent className="flex flex-col gap-3 p-6">
-                <div className="p-2 rounded-lg bg-red-500/10 self-start">
-                  <Camera className="h-6 w-6 text-red-500" />
-                </div>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mt-2">
-                  Upload Photos
-                </h3>
-                <p className="text-sm text-gray-600 dark:text-gray-300">
-                  Add new images to your gallery
-                </p>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </section>
+      </div>
     </div>
   );
 }

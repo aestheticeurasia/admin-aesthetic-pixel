@@ -11,7 +11,6 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import Image from "next/image";
 import Link from "next/link";
 import { useState, FormEvent } from "react";
 import { toast } from "sonner";
@@ -58,14 +57,9 @@ export default function Login() {
 
         return;
       }
-
       toast.error("Login failed");
-    } catch (error: unknown) {
-      if (axios.isAxiosError(error) && error.response) {
-        toast.error(error.response.data.message || "Something went wrong");
-      } else {
-        toast.error("Something went wrong");
-      }
+    } catch (error: any) {
+      toast.error(error.response.data.message);
     } finally {
       setLoading(false);
     }
@@ -77,7 +71,7 @@ export default function Login() {
       <div className="absolute bottom-[-10%] left-[-5%] w-[500px] h-[500px] bg-blue-500/5 dark:bg-blue-900/10 rounded-full blur-[100px] pointer-events-none" />
       <div className="container  md:px-20 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-60 items-center">
-          <div className="flex flex-col items-center lg:items-start text-center lg:text-left space-y-6 animate-in fade-in slide-in-from-top-full duration-1000 delay-500">
+          <div className="flex flex-col items-center lg:items-start text-center lg:text-left space-y-6 ">
             {/* Logo */}
             {/* <div className="relative w-full flex justify-center md:justify-start">
               <div className="absolute inset-0 bg-red-500/20 blur-2xl rounded-full dark:bg-red-900/20" />
@@ -116,7 +110,7 @@ export default function Login() {
             </div>
           </div>
 
-          <div className="w-full animate-in fade-in slide-in-from-right-full duration-1000 delay-500">
+          <div className="w-full ">
             <form onSubmit={handleSubmit}>
               <Card className="w-full max-w-md mx-auto border-gray-200 dark:border-gray-800 shadow-2xl shadow-gray-200/50 dark:shadow-black/50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm">
                 <CardHeader className="space-y-1 pb-6">

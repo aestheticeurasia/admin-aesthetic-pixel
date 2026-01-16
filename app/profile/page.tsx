@@ -119,7 +119,7 @@ export default function Profile() {
       setAvatar(null);
     } catch (error: any) {
       console.error(error);
-      toast.error(error.response?.data?.message || "Something went wrong");
+      toast.error(error.response?.data?.message);
     } finally {
       setAvatarLoading(false);
     }

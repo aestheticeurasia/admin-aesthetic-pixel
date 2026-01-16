@@ -7,6 +7,7 @@ import {
 } from "@/components/ui/sidebar";
 import {
   BookOpen,
+  Briefcase,
   CirclePlus,
   CirclePower,
   FileImage,
@@ -58,6 +59,16 @@ export function AppSidebar() {
       {/* Content */}
       <SidebarContent className="px-3 ">
         <div className="space-y-3">
+          <Link href="/orders">
+            <div
+              className={`flex items-center gap-3 font-bold cursor-pointer my-1 ${
+                pathname.startsWith("/orders") ? activeClass : inactiveClass
+              }`}
+            >
+              <Briefcase className="w-4 h-4" />
+              Orders
+            </div>
+          </Link>
           <Link href="/blog">
             <div
               className={`flex items-center gap-3 font-bold cursor-pointer my-1 ${
