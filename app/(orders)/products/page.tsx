@@ -149,7 +149,7 @@ export default function ProductsPage() {
   };
 
   return (
-    <div className="min-h-screen w-full bg-background p-8 text-foreground">
+    <div className="min-h-screen w-full bg-background lg:p-8 text-foreground">
       <div className="mx-auto max-w-5xl space-y-8">
         {/* Header */}
         <div className="flex items-center justify-between">
