@@ -42,7 +42,7 @@ export function OrderDetailsDialog({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="sm:max-w-[900px] p-0 overflow-hidden bg-white dark:bg-zinc-950">
+      <DialogContent className="sm:max-w-[900px] p-0  bg-white dark:bg-zinc-950 max-h-[80vh] overflow-y-auto">
         <DialogHeader className="p-6 border-b bg-zinc-50/50 dark:bg-zinc-900/50">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div className="space-y-1">
@@ -104,7 +104,7 @@ export function OrderDetailsDialog({
                   {selectedOrder?.orderItems.length} items
                 </span>
               </h3>
-              <div className="border rounded-md overflow-hidden">
+              <div className="border rounded-md h-100 overflow-y-auto">
                 <Table>
                   <TableHeader className="bg-zinc-50 dark:bg-zinc-900">
                     <TableRow className="hover:bg-transparent">
