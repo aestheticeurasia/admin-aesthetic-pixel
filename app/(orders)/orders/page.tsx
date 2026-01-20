@@ -277,7 +277,7 @@ export default function Orders() {
                           setSelectedOrder(order);
                           setOpen(true);
                         }}
-                        className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                        className="h-8 w-8 text-muted-foreground hover:text-foreground cursor-pointer"
                       >
                         <Eye size={16} />
                         <span className="sr-only">View Order</span>
