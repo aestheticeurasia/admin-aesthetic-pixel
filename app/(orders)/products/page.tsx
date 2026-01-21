@@ -174,8 +174,8 @@ export default function ProductsPage() {
 
             <Dialog open={open} onOpenChange={setOpen}>
               <DialogTrigger asChild>
-                <Button>
-                  <Plus className="mr-2 h-4 w-4" />
+                <Button variant="destructive" className="cursor-pointer flex items-center">
+                  <Plus className="h-4 w-4" />
                   Add Product
                 </Button>
               </DialogTrigger>
@@ -204,7 +204,7 @@ export default function ProductsPage() {
 
                   <div className="grid grid-cols-2 gap-4">
                     <div className="grid gap-2">
-                      <Label htmlFor="basePrice">Base Price</Label>
+                      <Label htmlFor="basePrice">Base Price (৳)</Label>
                       <Input
                         id="basePrice"
                         name="basePrice"

@@ -13,18 +13,24 @@ import { parseCookies, setCookie, destroyCookie } from "nookies";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 
-// --- Types ---
+//types
 interface User {
-  id?: string;
-  name?: string;
-  avatar?: string | null;
-  email?: string;
-  phone?: string;
-  role?: string;
-  status?: string;
-  createdAt?: string;
-  updatedAt?: string;
+  _id: string;
+  name: string;
+  avatar: string;
+  email: string;
+  phone: string;
+  status: string;
+  userType: "Client" | "Employee";
+  role: "Admin" | "Moderator" | "Viewer";
+  employeeId: string;
+  tokenVersion: number;
+  createdAt: string;
+  updatedAt: string;
+  __v: number;
 }
+
+
 
 interface AuthState {
   user: User | null;
@@ -36,9 +42,14 @@ interface AuthContextType {
   setAuth: React.Dispatch<React.SetStateAction<AuthState>>;
   loading: boolean;
   logout: () => void;
+  refreshAuth: () => Promise<void>;
 }
 
-const defaultState: AuthState = { user: null, token: null };
+const defaultState: AuthState = {
+  user: null,
+  token: null,
+};
+
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
@@ -46,31 +57,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
-  // load token & user on mount
   useEffect(() => {
     const initAuth = async () => {
       try {
-        const cookies = parseCookies();
-        const token = cookies["token"];
-
-        if (!token) {
-          setAuth(defaultState);
-          setLoading(false);
-          return;
-        }
-
-        setAuth((prev) => ({ ...prev, token }));
+        const { token } = parseCookies();
+        if (!token) return;
 
         const { data } = await axios.get(
           `${process.env.NEXT_PUBLIC_SERVER_ADDRESS}/api/v1/auth/me`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
         );
 
-        setAuth({ token, user: data.user });
-      } catch (err) {
-        console.error("Auth init error:", err);
+        setAuth({
+          token,
+          user: data.user,
+        });
+      } catch {
         destroyCookie(null, "token");
         setAuth(defaultState);
       } finally {
@@ -81,66 +82,71 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     initAuth();
   }, []);
 
-  // when token change, fetch user info
+  //fetch user
   useEffect(() => {
-    const fetchUser = async () => {
-      if (!auth.token) return;
+    if (!auth.token || auth.user) return;
+
+    const fetchMe = async () => {
       try {
         const { data } = await axios.get(
           `${process.env.NEXT_PUBLIC_SERVER_ADDRESS}/api/v1/auth/me`,
-          {
-            headers: { Authorization: `Bearer ${auth.token}` },
-          }
         );
 
         setAuth((prev) => ({
           ...prev,
           user: data.user,
         }));
-      } catch (err) {
-        console.error("Failed to fetch user:", err);
+      } catch {
         destroyCookie(null, "token");
         setAuth(defaultState);
         router.replace("/login");
       }
     };
 
-    fetchUser();
-  }, [auth.token]); //
+    fetchMe();
+  }, [auth.token, auth.user, router]);
 
-  //Axios Interceptor
+  // refresh auth
+  const refreshAuth = async () => {
+    try {
+      const { token } = parseCookies();
+      if (!token) return;
+
+      const { data } = await axios.get(
+        `${process.env.NEXT_PUBLIC_SERVER_ADDRESS}/api/v1/auth/me`,
+      );
+
+      setAuth({
+        token,
+        user: data.user,
+      });
+    } catch (err) {
+      console.error("Refresh auth failed:", err);
+    }
+  };
+
+  // sync token to cookie
+  useEffect(() => {
+    if (!auth.token) return;
+
+    setCookie(null, "token", auth.token, {
+      maxAge: 30 * 24 * 60 * 60,
+      path: "/",
+    });
+  }, [auth.token]);
+
   useLayoutEffect(() => {
-    const authInterceptor = axios.interceptors.request.use((config) => {
-      const cookies = parseCookies();
-      const token = cookies["token"];
-
+    const reqInterceptor = axios.interceptors.request.use((config) => {
+      const { token } = parseCookies();
       if (token) config.headers.Authorization = `Bearer ${token}`;
       return config;
     });
 
-    return () => axios.interceptors.request.eject(authInterceptor);
+    return () => axios.interceptors.request.eject(reqInterceptor);
   }, []);
 
-  // Logout
-  const logout = () => {
-    destroyCookie(null, "token", { path: "/" });
-    setAuth(defaultState);
-    router.replace("/login");
-  };
-
-  // Sync token into cookies
-  useEffect(() => {
-    if (auth.token) {
-      setCookie(null, "token", auth.token, {
-        maxAge: 30 * 24 * 60 * 60,
-        path: "/",
-      });
-    }
-  }, [auth.token]);
-
-  //auto logout
   useLayoutEffect(() => {
-    const responseInterceptor = axios.interceptors.response.use(
+    const resInterceptor = axios.interceptors.response.use(
       (res) => res,
       (err) => {
         if (err.response?.status === 401) {
@@ -149,16 +155,22 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           router.replace("/login");
         }
         return Promise.reject(err);
-      }
+      },
     );
 
-    return () => axios.interceptors.response.eject(responseInterceptor);
-  }, []);
+    return () => axios.interceptors.response.eject(resInterceptor);
+  }, [router]);
 
-  return (
-    <AuthContext.Provider value={{ auth, setAuth, loading, logout }}>
-      {loading && !auth.token ? (
-       <div className="min-h-screen flex items-center justify-center bg-gray-950">
+  // logout
+  const logout = () => {
+    destroyCookie(null, "token", { path: "/" });
+    setAuth(defaultState);
+  };
+
+  //loading
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-950">
         <Image
           src="/logoDark.png"
           alt="Aesthetic Pixel Studio LLC"
@@ -167,15 +179,23 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           className="animate-pulse"
         />
       </div>
-      ) : (
-        children
-      )}
+    );
+  }
+
+  return (
+    <AuthContext.Provider
+      value={{ auth, setAuth, loading, logout, refreshAuth }}
+    >
+      {children}
     </AuthContext.Provider>
   );
 };
 
+// hook
 export const useAuth = (): AuthContextType => {
   const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error("useAuth must be used within an AuthProvider");
+  if (!ctx) {
+    throw new Error("useAuth must be used within AuthProvider");
+  }
   return ctx;
 };

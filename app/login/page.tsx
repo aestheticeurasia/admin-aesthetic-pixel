@@ -12,10 +12,10 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
-import { useState, FormEvent } from "react";
+import { useState, FormEvent, useEffect } from "react";
 import { toast } from "sonner";
 import axios from "axios";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Spinner } from "@/components/ui/spinner";
 import { useAuth } from "../context/auth";
 
@@ -25,9 +25,11 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const { auth, setAuth } = useAuth();
+  const searchParams = useSearchParams();
   const router = useRouter();
+  const from = searchParams.get("from") || "/dashboard";
 
-  //handle Login
+//handle Login
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
@@ -39,21 +41,18 @@ export default function Login() {
 
     try {
       const res = await axios.post(
-        `${process.env.NEXT_PUBLIC_SERVER_ADDRESS}/api/v1/auth/login`,
+        `${process.env.NEXT_PUBLIC_SERVER_ADDRESS}/api/v1/auth/employee-login`,
         loginData
       );
 
       if (res && res.data.success) {
         setAuth({
           user: null,
+          profiles: null,
           token: res.data.token,
         });
-
         toast.success(res.data.message);
-
-        const params = new URLSearchParams(window.location.search);
-        const redirectTo = params.get("from") || "/";
-        router.push(redirectTo);
+        router.push(from);
 
         return;
       }
@@ -64,6 +63,22 @@ export default function Login() {
       setLoading(false);
     }
   };
+
+    // redirect logged-in users immediately
+  useEffect(() => {
+    if (!loading && auth.token) {
+      router.replace(from);
+    }
+  }, [auth.token, loading, router, from]);
+
+  // don't render login form until auth is ready
+  if (loading || auth.token) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-gray-400 font-bold">
+        <Spinner className="size-9"/> &nbsp; Redirecting...
+      </div>
+    );
+  }
 
   return (
     <div className="relative min-h-screen w-full flex items-center justify-center p-4 bg-gray-50 dark:bg-gray-950 overflow-hidden">

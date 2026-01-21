@@ -25,7 +25,6 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
@@ -99,7 +98,7 @@ export default function Profile() {
       );
 
       const updatedUser = {
-        ...auth.user,
+        ...auth?.user,
         avatar: data?.user?.avatar || data?.avatar,
       };
 
@@ -160,7 +159,7 @@ export default function Profile() {
                       avatar
                         ? URL.createObjectURL(avatar)
                         : auth?.user?.avatar
-                        ? auth.user.avatar
+                        ? auth?.user?.avatar
                         : demoAvatar
                     }
                     alt="profile-img"
@@ -232,7 +231,7 @@ export default function Profile() {
                       Full Name
                     </p>
                     <p className="text-base font-medium text-foreground">
-                      {auth?.user?.name}
+                    {auth?.user?.name}
                     </p>
                   </div>
                 </div>
@@ -396,54 +395,6 @@ export default function Profile() {
                 </CardContent>
               </Card>
             </div>
-
-            <Card className="border-border/50 shadow-sm">
-              <CardHeader>
-                <CardTitle className="text-lg font-semibold">
-                  Notifications
-                </CardTitle>
-                <CardDescription>
-                  Choose how you want to receive alerts.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="grid gap-6">
-                <div className="flex items-center justify-between space-x-4 border-b border-border pb-4 last:border-0 last:pb-0">
-                  <div className="space-y-0.5">
-                    <p className="font-medium text-foreground">
-                      Email Notifications
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      Receive email updates for comments and mentions.
-                    </p>
-                  </div>
-                  <Switch defaultChecked />
-                </div>
-
-                <div className="flex items-center justify-between space-x-4 border-b border-border pb-4 last:border-0 last:pb-0">
-                  <div className="space-y-0.5">
-                    <p className="font-medium text-foreground">
-                      SMS Notifications
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      Receive SMS alerts for critical security events.
-                    </p>
-                  </div>
-                  <Switch defaultChecked />
-                </div>
-
-                <div className="flex items-center justify-between space-x-4">
-                  <div className="space-y-0.5">
-                    <p className="font-medium text-foreground">
-                      Marketing Communications
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      Receive updates about new features.
-                    </p>
-                  </div>
-                  <Switch />
-                </div>
-              </CardContent>
-            </Card>
           </div>
         </div>
       </div>

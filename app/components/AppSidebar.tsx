@@ -22,20 +22,20 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { toast } from "sonner";
 import { useAuth } from "../context/auth";
-import { destroyCookie } from "nookies";
+import { useRouter } from "next/navigation";
 
 export function AppSidebar() {
   const pathname = usePathname();
-  const { setAuth } = useAuth();
+  const { logout } = useAuth();
+  const router = useRouter();
 
   const activeClass = "bg-red-600 text-white rounded-md p-2 w-full";
   const inactiveClass = "hover:bg-muted/50 rounded-md p-2 w-full";
 
   const handleLogout = () => {
-    setAuth({ user: null, token: null });
-    destroyCookie(null, "auth", { path: "/" });
+    logout();
+    router.push("/");
     toast.success("Logged out successfully");
-    window.location.href = "/login";
   };
 
   return (

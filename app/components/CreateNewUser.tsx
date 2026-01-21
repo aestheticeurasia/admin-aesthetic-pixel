@@ -11,18 +11,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import Image from "next/image";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Trash2, X, Loader2, UploadCloud } from "lucide-react";
 import axios from "axios";
 import { toast } from "sonner";
-
-const permissionsList = [
-  { value: "view-dashboard", label: "View Dashboard" },
-  { value: "manage-users", label: "Manage Users" },
-  { value: "edit-content", label: "Edit Content" },
-  { value: "access-report", label: "Access Report" },
-  { value: "configure-settings", label: "Configure Settings" },
-];
 
 interface AddNewUserProps {
   onClose?: () => void;
@@ -37,17 +28,11 @@ export default function AddNewUser({
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [role, setRole] = useState("");
+  const [employeeId, setEmployeeId] = useState("");
   const [password, setPassword] = useState("");
   const [avatar, setAvatar] = useState<File | null>(null);
-  const [permissions, setPermissions] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const demoAvatar = "/demoAvatar.png";
-
-  const handlePermissionChange = (value: string, checked: boolean) => {
-    setPermissions((prev) =>
-      checked ? [...prev, value] : prev.filter((v) => v !== value)
-    );
-  };
 
   const handleCreate = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -58,8 +43,8 @@ export default function AddNewUser({
     formData.append("email", email);
     formData.append("phone", phone);
     formData.append("role", role);
+    formData.append("employeeId", employeeId);
     formData.append("password", password);
-    formData.append("permissions", JSON.stringify(permissions));
 
     if (avatar) {
       formData.append("avatar", avatar);
@@ -85,8 +70,7 @@ export default function AddNewUser({
       setRole("");
       setPassword("");
       setAvatar(null);
-      setPermissions([]);
-
+      setEmployeeId("");
       onUserCreated?.();
       onClose?.();
     } catch (error: any) {
@@ -186,6 +170,18 @@ export default function AddNewUser({
                 </div>
 
                 <div className="space-y-2 md:col-span-2">
+                  <Label htmlFor="employeeId">Employee ID</Label>
+                  <Input
+                    id="employeeId"
+                    type="text"
+                    value={employeeId}
+                    onChange={(e) => setEmployeeId(e.target.value)}
+                    placeholder="Employee ID"
+                    disabled={loading}
+                    required
+                  />
+                </div>
+                <div className="space-y-2 md:col-span-2">
                   <Label htmlFor="password">Password</Label>
                   <Input
                     id="password"
@@ -267,37 +263,7 @@ export default function AddNewUser({
 
                 <div className="border-t my-4" />
 
-                {/* Permissions Section */}
-                <div>
-                  <h3 className="font-medium mb-3 text-sm text-muted-foreground uppercase tracking-wider">
-                    Permissions
-                  </h3>
-                  <div className="space-y-3 bg-muted/30 p-4 rounded-lg border">
-                    {permissionsList.map((perm) => (
-                      <div
-                        key={perm.value}
-                        className="flex items-center space-x-3"
-                      >
-                        <Checkbox
-                          className="border-red-700 data-[state=checked]:bg-red-600 data-[state=checked]:border-red-600 data-[state=checked]:hover:bg-red-700 data-[state=checked]:focus:ring-red-500"
-                          id={perm.value}
-                          checked={permissions.includes(perm.value)}
-                          disabled={loading}
-                          onCheckedChange={(checked) =>
-                            handlePermissionChange(perm.value, checked === true)
-                          }
-                        />
-                        <Label
-                          htmlFor={perm.value}
-                          className="text-sm font-normal cursor-pointer select-none"
-                        >
-                          {perm.label}
-                        </Label>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
+            
                 {/* Action Buttons */}
                 <div className="mt-auto pt-8 flex gap-3">
                   <Button

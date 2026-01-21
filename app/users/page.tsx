@@ -47,15 +47,14 @@ dayjs.extend(relativeTime);
 
 interface User {
   _id: string;
-  name: string;
-  avatar: string | null;
   email: string;
   phone: string;
+  name: string;
+  avatar: string | null;
   role: string;
   status: string;
   createdAt: string;
   updatedAt: string;
-
   createdBy: UserRef | null;
   updatedBy: UserRef | null;
 }
@@ -64,7 +63,6 @@ interface UserRef {
   _id: string;
   name: string;
 }
-
 interface UsersResponse {
   success: boolean;
   message: string;
@@ -85,14 +83,15 @@ export default function UsersList() {
     try {
       setSpinnerLoading(true);
 
-      const res = await axios.get<UsersResponse>(
-        `${process.env.NEXT_PUBLIC_SERVER_ADDRESS}/api/v1/auth/all-users`
+      const { data } = await axios.get<UsersResponse>(
+        `${process.env.NEXT_PUBLIC_SERVER_ADDRESS}/api/v1/auth/all-employees`,
       );
 
-      setAllUsers(res.data.users);
+      setAllUsers(data.users);
     } catch (error) {
       console.error(error);
-      toast.error("Error fetching users");
+      toast.error("Error fetching employees");
+      setAllUsers([]);
     } finally {
       setSpinnerLoading(false);
     }
@@ -105,7 +104,7 @@ export default function UsersList() {
     try {
       setDeleteLoading(true);
       const { data } = await axios.delete<UsersResponse>(
-        `${process.env.NEXT_PUBLIC_SERVER_ADDRESS}/api/v1/auth/delete-user/${userToDelete}`
+        `${process.env.NEXT_PUBLIC_SERVER_ADDRESS}/api/v1/auth/delete-user/${userToDelete}`,
       );
       if (data.success) {
         toast.success(data.message);
@@ -239,8 +238,8 @@ export default function UsersList() {
       user?.role === "Admin"
         ? "bg-yellow-500 font-extrabold text-black"
         : user?.role === "Moderator"
-        ? "bg-sky-500 font-bold text-white"
-        : "bg-gray-500 text-white"
+          ? "bg-sky-500 font-bold text-white"
+          : "bg-gray-500 text-white"
     }
   `}
                   >
@@ -313,7 +312,7 @@ export default function UsersList() {
                 colSpan={9}
                 className="text-center py-10 dark:text-gray-100 font-bold"
               >
-                No users found.
+                No Employee Found
               </TableCell>
             </TableRow>
           )}
@@ -322,8 +321,9 @@ export default function UsersList() {
 
       <Dialog open={updateUserModalOpen} onOpenChange={setUpdateUserModalOpen}>
         <DialogContent
-        onOpenAutoFocus={(e) => e.preventDefault()} 
-        className="sm:max-w-[1100px] w-full max-h-[90vh] overflow-y-auto">
+          onOpenAutoFocus={(e) => e.preventDefault()}
+          className="sm:max-w-[1100px] w-full max-h-[90vh] overflow-y-auto"
+        >
           <DialogHeader>
             <span className="text-xl font-bold">Update User</span>
           </DialogHeader>
