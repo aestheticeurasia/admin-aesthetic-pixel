@@ -53,7 +53,7 @@ export function OrderDetailsDialog({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="sm:max-w-[1000px] p-0 overflow-hidden gap-0 bg-background flex flex-col max-h-[95vh] lg:max-h-[95vh] [&>button]:z-50">
+      <DialogContent className="sm:max-w-[1000px] p-0 overflow-hidden gap-0 bg-background flex flex-col max-h-[85vh] lg:max-h-[95vh] [&>button]:z-50">
         <DialogHeader className="p-6 border-b bg-background z-10 shrink-0">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div className="space-y-1.5">
