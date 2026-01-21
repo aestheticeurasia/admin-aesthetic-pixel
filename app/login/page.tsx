@@ -48,7 +48,6 @@ export default function Login() {
       if (res && res.data.success) {
         setAuth({
           user: null,
-          profiles: null,
           token: res.data.token,
         });
         toast.success(res.data.message);

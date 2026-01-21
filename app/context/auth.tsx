@@ -30,8 +30,6 @@ interface User {
   __v: number;
 }
 
-
-
 interface AuthState {
   user: User | null;
   token: string | null;
