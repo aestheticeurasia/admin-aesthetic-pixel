@@ -6,9 +6,11 @@ import Header from "./components/Header";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "./components/AppSidebar";
 import { ThemeProvider } from "next-themes";
-import { usePathname } from "next/navigation";
-import { AuthProvider } from "./context/auth";
-import { useAuth } from "./context/auth";
+import { usePathname, useRouter } from "next/navigation";
+import { AuthProvider, useAuth } from "./context/auth";
+import { useEffect } from "react";
+
+const publicRoutes = ["/login", "/forgot-password"];
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -25,9 +27,18 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
 function RootLayoutContent({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const { auth } = useAuth();
+  const router = useRouter();
+  const { auth, loading } = useAuth();
 
-  const hideLayout = pathname === "/login" || !auth?.token;
+  useEffect(() => {
+    if (!loading && !auth?.token && !publicRoutes.includes(pathname)) {
+      router.replace("/login");
+    }
+  }, [loading, auth?.token, pathname, router]);
+
+  if (loading || (!auth?.token && !publicRoutes.includes(pathname))) return null;
+
+  const hideLayout = publicRoutes.includes(pathname);
 
   return (
     <ThemeProvider
@@ -56,4 +67,4 @@ function RootLayoutContent({ children }: { children: React.ReactNode }) {
       )}
     </ThemeProvider>
   );
-};
+}

@@ -4,21 +4,19 @@ import { useAuth } from "./context/auth";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import AppDashboard from "./dashboard/page";
-import Login from "./login/page";
 
 export default function Home() {
   const { auth, loading } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
-    if (!loading && !auth.token) {
+    if (!loading && !auth?.token) {
       router.replace("/login");
     }
-  }, [loading, auth.token]);
+  }, [loading, auth?.token, router]);
 
   if (loading) return <div>Loading...</div>;
+  if (!auth?.token) return null; 
 
-  if (auth.token) return <AppDashboard />;
-
-  return <Login />;
+  return <AppDashboard />;
 }

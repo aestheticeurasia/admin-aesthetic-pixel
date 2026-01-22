@@ -79,20 +79,17 @@ export default function UsersList() {
 
   // Fetch all users
   const getAllUsers = async () => {
+    setSpinnerLoading(true);
     try {
-      setSpinnerLoading(true);
-
       const { data } = await axios.get<UsersResponse>(
         `${process.env.NEXT_PUBLIC_SERVER_ADDRESS}/api/v1/auth/all-employees`,
       );
-
       setAllUsers(data.users);
-    } catch (error) {
-      console.error(error);
-      toast.error("Error fetching employees");
-      setAllUsers([]);
-    } finally {
       setSpinnerLoading(false);
+    } catch (error: any) {
+      toast.error(error.response?.data?.message);
+      setSpinnerLoading(false);
+      setAllUsers([]);
     }
   };
 

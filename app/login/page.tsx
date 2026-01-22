@@ -12,7 +12,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
-import { useState, FormEvent, useEffect } from "react";
+import { useState, FormEvent } from "react";
 import { toast } from "sonner";
 import axios from "axios";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -52,7 +52,6 @@ export default function Login() {
         });
         toast.success(res.data.message);
         router.push(from);
-
         return;
       }
       toast.error("Login failed");
@@ -63,22 +62,6 @@ export default function Login() {
     }
   };
 
-    // redirect logged-in users immediately
-  useEffect(() => {
-    if (!loading && auth.token) {
-      router.replace(from);
-    }
-  }, [auth.token, loading, router, from]);
-
-  // don't render login form until auth is ready
-  if (loading || auth.token) {
-    return (
-      <div className="min-h-screen flex items-center justify-center text-gray-400 font-bold">
-        <Spinner className="size-9"/> &nbsp; Redirecting...
-      </div>
-    );
-  }
-
   return (
     <div className="relative min-h-screen w-full flex items-center justify-center p-4 bg-gray-50 dark:bg-gray-950 overflow-hidden">
       <div className="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] bg-red-500/10 rounded-full blur-[100px] pointer-events-none" />
@@ -86,28 +69,6 @@ export default function Login() {
       <div className="container  md:px-20 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-60 items-center">
           <div className="flex flex-col items-center lg:items-start text-center lg:text-left space-y-6 ">
-            {/* Logo */}
-            {/* <div className="relative w-full flex justify-center md:justify-start">
-              <div className="absolute inset-0 bg-red-500/20 blur-2xl rounded-full dark:bg-red-900/20" />
-              <Image
-                src="/logo.png"
-                alt="Aesthetic Pixel Logo"
-                width={350}
-                height={90}
-                className="relative block dark:hidden w-40 md:w-[150px] h-auto object-contain"
-                priority
-              />
-
-              <Image
-                src="/logoDark.png"
-                alt="Aesthetic Pixel Logo Dark"
-                width={250}
-                height={90}
-                className="relative hidden dark:block w-40 md:w-[150px] h-auto object-contain"
-                priority
-              />
-            </div> */}
-
             <div className="space-y-5">
               <h1 className="font-extrabold text-4xl sm:text-5xl tracking-tight text-gray-900 dark:text-gray-50 leading-snug">
                 Welcome to <br />
