@@ -15,23 +15,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
-import { MoreHorizontal, Edit, Trash, UserPlus } from "lucide-react";
+import { Lock, Unlock, MoreHorizontal } from "lucide-react";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "sonner";
@@ -69,19 +53,17 @@ interface UsersResponse {
 
 export default function UsersList() {
   const [allUsers, setAllUsers] = useState<User[]>([]);
+  const [updatedStatus, setUpdatedStatus] = useState<string>("");
+  const [userId, setUserId] = useState<string>("");
   const [spinnerLoading, setSpinnerLoading] = useState(false);
-  const [deleteLoading, setDeleteLoading] = useState(false);
-  const [userToDelete, setUserToDelete] = useState<string | null>(null);
 
   // Fetch all users
   const getAllClients = async () => {
     try {
       setSpinnerLoading(true);
-
       const { data } = await axios.get<UsersResponse>(
         `${process.env.NEXT_PUBLIC_SERVER_ADDRESS}/api/v1/auth/all-clients`,
       );
-
       setAllUsers(data.users);
     } catch (error) {
       console.error(error);
@@ -95,6 +77,28 @@ export default function UsersList() {
   useEffect(() => {
     getAllClients();
   }, []);
+
+  // Update client status
+  const handleStatusUpdate = async (userId: string, status: string) => {
+    const isBlocking = status === "Blocked";
+
+    const updatePromise = axios.put(
+      `${process.env.NEXT_PUBLIC_SERVER_ADDRESS}/api/v1/auth/update-client/${userId}`,
+      { status },
+    );
+
+    toast.promise(updatePromise, {
+      loading: isBlocking ? "Blocking client..." : "Activating client...",
+      success: (data) => {
+        getAllClients();
+        return (
+          data.data.message ||
+          `Client ${isBlocking ? "Blocked" : "Activated"} successfully`
+        );
+      },
+      error: (error) => error?.response?.data?.message || "Update failed",
+    });
+  };
 
   return (
     <div className="container mx-auto py-8 md:px-8">
@@ -154,7 +158,7 @@ export default function UsersList() {
             allUsers.map((user, index) => (
               <TableRow key={user._id} className="dark:hover:bg-gray-700">
                 <TableCell className="dark:text-gray-100">
-                  <b> {index + 1}</b>
+                  <b>{index + 1}</b>
                 </TableCell>
                 <TableCell className="dark:text-gray-100">
                   <div className="flex gap-2 items-center">
@@ -165,7 +169,7 @@ export default function UsersList() {
                       />
                       <AvatarFallback>CN</AvatarFallback>
                     </Avatar>
-                    <span className="font-bold"> {user?.name}</span>
+                    <span className="font-bold">{user?.name}</span>
                   </div>
                 </TableCell>
                 <TableCell className="dark:text-gray-100">
@@ -176,27 +180,28 @@ export default function UsersList() {
                 </TableCell>
                 <TableCell className="dark:text-gray-100">
                   <Badge
-                    className={`
-    capitalize
-    ${
-      user?.role === "Admin"
-        ? "bg-yellow-500 font-extrabold text-black"
-        : user?.role === "Moderator"
-          ? "bg-sky-500 font-bold text-white"
-          : "bg-gray-500 text-white"
-    }
-  `}
+                    className={`capitalize ${
+                      user?.role === "Admin"
+                        ? "bg-yellow-500 font-extrabold text-black"
+                        : user?.role === "Moderator"
+                          ? "bg-sky-500 font-bold text-white"
+                          : "bg-gray-500 text-white"
+                    }`}
                   >
                     {user?.role}
                   </Badge>
                 </TableCell>
                 <TableCell className="dark:text-gray-100">
                   <Badge
-                    className={`
-    capitalize
-    ${user?.status === "Active" ? "bg-green-700 font-bold text-white" : ""}
-    ${user?.status === "Blocked" ? "bg-red-500 font-bold text-white" : ""}
-  `}
+                    className={`capitalize ${
+                      user?.status === "Active"
+                        ? "bg-green-700 font-bold text-white"
+                        : ""
+                    } ${
+                      user?.status === "Blocked"
+                        ? "bg-red-500 font-bold text-white"
+                        : ""
+                    }`}
                   >
                     {user?.status}
                   </Badge>
@@ -211,7 +216,7 @@ export default function UsersList() {
                 </TableCell>
                 <TableCell className="dark:text-gray-100">
                   {dayjs(user?.updatedAt).fromNow()}
-                  {user?.createdBy && (
+                  {user?.updatedBy && (
                     <div className="text-sm text-gray-500">
                       by {user?.updatedBy?.name}
                     </div>
@@ -231,10 +236,27 @@ export default function UsersList() {
 
                     <DropdownMenuContent align="end" className="w-36">
                       <DropdownMenuItem
-                        className="flex items-center gap-2 text-destructive cursor-pointer font-bold"
-                        onClick={() => setUserToDelete(user._id)}
+                        className={`flex items-center gap-2 cursor-pointer font-bold ${
+                          user.status === "Active"
+                            ? "text-destructive focus:text-destructive"
+                            : "text-green-600 focus:text-green-600"
+                        }`}
+                        onClick={() =>
+                          handleStatusUpdate(
+                            user._id,
+                            user.status === "Active" ? "Blocked" : "Active",
+                          )
+                        }
                       >
-                        <Trash className="w-4 h-4" /> Delete
+                        {user.status === "Active" ? (
+                          <>
+                            <Lock className="w-4 h-4" /> Block
+                          </>
+                        ) : (
+                          <>
+                            <Unlock className="w-4 h-4" /> Activate
+                          </>
+                        )}
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
