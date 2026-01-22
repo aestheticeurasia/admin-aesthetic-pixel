@@ -31,13 +31,25 @@ function RootLayoutContent({ children }: { children: React.ReactNode }) {
   const { auth, loading } = useAuth();
 
   useEffect(() => {
-    if (!loading && !auth?.token && !publicRoutes.includes(pathname)) {
+    if (loading) return;
+
+    if (!auth?.token && !publicRoutes.includes(pathname)) {
       router.replace("/login");
+      return;
+    }
+
+    if (auth?.token && publicRoutes.includes(pathname)) {
+      router.replace("/"); 
+      return;
     }
   }, [loading, auth?.token, pathname, router]);
 
-  if (loading || (!auth?.token && !publicRoutes.includes(pathname))) return null;
+  // Render nothing while loading or redirecting
+  if (loading) return <div>Loading...</div>;
+  if (!auth?.token && !publicRoutes.includes(pathname)) return null;
+  if (auth?.token && publicRoutes.includes(pathname)) return null;
 
+  // Hide layout for public routes
   const hideLayout = publicRoutes.includes(pathname);
 
   return (
