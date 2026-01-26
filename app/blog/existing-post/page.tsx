@@ -114,7 +114,7 @@ export default function ExistingPost() {
   };
 
   return (
-    <div className="p-6 max-w-7xl mx-auto space-y-6">
+    <div className="p-6 space-y-6">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Blog Posts</h1>
@@ -122,9 +122,9 @@ export default function ExistingPost() {
             Manage your blog content, edit existing posts, or publish new ones.
           </p>
         </div>
-        <Button asChild>
+        <Button asChild className="bg-red-700 cursor-pointer hover:bg-red-600 text-white py-2">
           <Link href="/blog/create">
-            <Plus className="w-4 h-4 mr-2" /> Create New Post
+            <Plus className="w-5 h-5" /> Create New Post
           </Link>
         </Button>
       </div>
@@ -150,11 +150,11 @@ export default function ExistingPost() {
             </div>
         </CardHeader>
 
-        <CardContent className="p-0">
+        <CardContent>
           <Table>
             <TableHeader className="bg-muted/50">
               <TableRow>
-                {/* 1. Added Serial Number Header */}
+                {/* Added Serial Number Header */}
                 <TableHead className="w-[50px]">#</TableHead> 
                 <TableHead className="w-[350px]">Post Details</TableHead>
                 <TableHead>Category</TableHead>
@@ -172,7 +172,7 @@ export default function ExistingPost() {
                     <TableCell><Skeleton className="h-4 w-4" /></TableCell>
                     <TableCell><div className="space-y-2"><Skeleton className="h-4 w-[250px]" /><Skeleton className="h-3 w-[100px]" /></div></TableCell>
                     <TableCell><Skeleton className="h-4 w-[100px]" /></TableCell>
-                    <TableCell><Skeleton className="h-5 w-[80px] rounded-full" /></TableCell>
+                    <TableCell><Skeleton className="h-5 w-20 rounded-full" /></TableCell>
                     <TableCell><Skeleton className="h-4 w-[120px]" /></TableCell>
                     <TableCell><Skeleton className="h-4 w-[100px]" /></TableCell>
                     <TableCell className="text-right"><Skeleton className="h-8 w-8 ml-auto" /></TableCell>
@@ -182,7 +182,7 @@ export default function ExistingPost() {
                 filteredBlogs.map((post, index) => (
                   <TableRow key={post._id} className="group">
                     
-                    {/* 3. Render the Serial Number */}
+                    {/* Render the Serial Number */}
                     <TableCell className="font-medium text-muted-foreground">
                         {index + 1}
                     </TableCell>
@@ -246,7 +246,7 @@ export default function ExistingPost() {
                     <TableCell className="text-right">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" className="h-8 w-8">
+                          <Button variant="ghost" size="icon" className="h-8 w-8 cursor-pointer dark:bg-[#131313] border-2">
                             <MoreHorizontal className="h-4 w-4" />
                           </Button>
                         </DropdownMenuTrigger>
@@ -270,13 +270,13 @@ export default function ExistingPost() {
                 ))
               ) : (
                 <TableRow>
-                  {/* 4. Updated colSpan to 7 to account for new column */}
+                  {/* Updated colSpan to 7 to account for new column */}
                   <TableCell colSpan={7} className="h-64 text-center">
                     <div className="flex flex-col items-center justify-center text-muted-foreground">
                         <AlertCircle className="w-10 h-10 mb-2 opacity-20" />
                         <p>No blogs found matching your criteria.</p>
                         {searchQuery && (
-                            <Button variant="link" onClick={() => setSearchQuery("")} className="mt-2">
+                            <Button variant="link" onClick={() => setSearchQuery("")} className="mt-2 cursor-pointer">
                                 Clear search
                             </Button>
                         )}
@@ -289,7 +289,7 @@ export default function ExistingPost() {
         </CardContent>
       </Card>
       
-      {/* Alert Dialog (Same as before) */}
+      {/* Alert Dialog */}
       <AlertDialog open={!!blogToDelete} onOpenChange={(open) => !open && setBlogToDelete(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -299,9 +299,9 @@ export default function ExistingPost() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+            <AlertDialogCancel disabled={isDeleting} className="dark:text-white cursor-pointer">Cancel</AlertDialogCancel>
             <AlertDialogAction
-              className="bg-red-600 hover:bg-red-700"
+              className="bg-red-600 hover:bg-red-700 dark:text-white cursor-pointer"
               onClick={handleDeleteBlog}
               disabled={isDeleting}
             >
