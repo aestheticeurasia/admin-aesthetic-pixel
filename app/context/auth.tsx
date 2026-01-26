@@ -55,22 +55,29 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
+  // 1. Initial Load
   useEffect(() => {
     const initAuth = async () => {
       try {
-        const { token } = parseCookies();
+        const cookies = parseCookies();
+        const token = cookies.token;
+        
         if (!token) return;
 
         const { data } = await axios.get(
-          `${process.env.NEXT_PUBLIC_SERVER_ADDRESS}/api/v1/auth/me`,
+          `${process.env.NEXT_PUBLIC_SERVER_ADDRESS}/api/v1/auth/me`
         );
+
+        if (data.user && data.user.userType !== "Employee") {
+          throw new Error("Unauthorized: Not an employee");
+        }
 
         setAuth({
           token,
           user: data.user,
         });
-      } catch {
-        destroyCookie(null, "token");
+      } catch (error) {
+        destroyCookie(null, "token", { path: "/" });
         setAuth(defaultState);
       } finally {
         setLoading(false);
@@ -80,22 +87,25 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     initAuth();
   }, []);
 
-  //fetch user
   useEffect(() => {
     if (!auth.token || auth.user) return;
 
     const fetchMe = async () => {
       try {
         const { data } = await axios.get(
-          `${process.env.NEXT_PUBLIC_SERVER_ADDRESS}/api/v1/auth/me`,
+          `${process.env.NEXT_PUBLIC_SERVER_ADDRESS}/api/v1/auth/me`
         );
+
+        if (data.user && data.user.userType !== "Employee") {
+          throw new Error("Unauthorized: Not an employee");
+        }
 
         setAuth((prev) => ({
           ...prev,
           user: data.user,
         }));
       } catch {
-        destroyCookie(null, "token");
+        destroyCookie(null, "token", { path: "/" });
         setAuth(defaultState);
         router.replace("/login");
       }
@@ -104,15 +114,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     fetchMe();
   }, [auth.token, auth.user, router]);
 
-  // refresh auth
   const refreshAuth = async () => {
     try {
-      const { token } = parseCookies();
+      const cookies = parseCookies();
+      const token = cookies.token;
+      
       if (!token) return;
 
       const { data } = await axios.get(
-        `${process.env.NEXT_PUBLIC_SERVER_ADDRESS}/api/v1/auth/me`,
+        `${process.env.NEXT_PUBLIC_SERVER_ADDRESS}/api/v1/auth/me`
       );
+
+      if (data.user && data.user.userType !== "Employee") {
+         logout();
+         return;
+      }
 
       setAuth({
         token,
@@ -123,7 +139,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  // sync token to cookie
   useEffect(() => {
     if (!auth.token) return;
 
@@ -135,7 +150,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   useLayoutEffect(() => {
     const reqInterceptor = axios.interceptors.request.use((config) => {
-      const { token } = parseCookies();
+      const cookies = parseCookies();
+      const token = cookies.token; 
+      
       if (token) config.headers.Authorization = `Bearer ${token}`;
       return config;
     });
@@ -153,19 +170,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           router.replace("/login");
         }
         return Promise.reject(err);
-      },
+      }
     );
 
     return () => axios.interceptors.response.eject(resInterceptor);
   }, [router]);
 
-  // logout
   const logout = () => {
-    destroyCookie(null, "token", { path: "/" });
+    destroyCookie(null, "token", { path: "/" }); 
     setAuth(defaultState);
+    router.replace("/login");
   };
 
-  //loading
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-950">
@@ -189,7 +205,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
-// hook
 export const useAuth = (): AuthContextType => {
   const ctx = useContext(AuthContext);
   if (!ctx) {

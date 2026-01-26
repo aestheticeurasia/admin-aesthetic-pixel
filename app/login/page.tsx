@@ -50,7 +50,7 @@ export default function Login() {
           user: null,
           token: res.data.token,
         });
-        toast.success(res.data.message);
+        toast.success(res.data.message || "Login successful");
         router.push(from);
         return;
       }

@@ -1,10 +1,38 @@
 "use client";
+
+import { useState, useEffect, useMemo } from "react";
+import Link from "next/link";
+import axios from "axios";
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+import { toast } from "sonner";
+import {
+  Edit,
+  MoreHorizontal,
+  Trash,
+  Search,
+  Plus,
+  FileText,
+  Calendar,
+  User,
+  AlertCircle
+} from "lucide-react";
+
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
@@ -25,59 +53,31 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Edit, MoreHorizontal, Trash } from "lucide-react";
-import { useEffect, useState } from "react";
-import { Spinner } from "@/components/ui/spinner";
-import dayjs from "dayjs";
-import { toast } from "sonner";
-import axios from "axios";
-import relativeTime from "dayjs/plugin/relativeTime";
-import Link from "next/link";
+import { Skeleton } from "@/components/ui/skeleton";
+
 dayjs.extend(relativeTime);
 
-interface BlogResponse {
-  success: boolean;
-  message: string;
-}
+// ... (Interfaces remain the same) ...
 
 export default function ExistingPost() {
-  const [blogToDelete, setBlogToDelete] = useState<string | null>(null);
-  const [deleteLoading, setDeleteLoading] = useState(false);
-  const [spinnerLoading, setSpinnerLoading] = useState(false);
+  // ... (State and Logic remain the same) ...
   const [blogs, setBlogs] = useState<any[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+  const [blogToDelete, setBlogToDelete] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
-  //get all blog
   const fetchAllBlogs = async () => {
-    setSpinnerLoading(true);
+    setIsLoading(true);
     try {
       const { data } = await axios.get(
-        `${process.env.NEXT_PUBLIC_SERVER_ADDRESS}/api/v1/blog/get-all-blogs`,
+        `${process.env.NEXT_PUBLIC_SERVER_ADDRESS}/api/v1/blog/get-all-blogs`
       );
-      setBlogs(data.blogs);
-      setSpinnerLoading(false);
+      setBlogs(data.blogs || []);
     } catch (error: any) {
-      toast.error(error.response?.data?.message);
-      setSpinnerLoading(false);
-    }
-  };
-
-  //delete blog
-  const handleDeleteBlog = async (blogToDelete: string) => {
-    setDeleteLoading(true);
-    const { data } = await axios.delete<BlogResponse>(
-      `${process.env.NEXT_PUBLIC_SERVER_ADDRESS}/api/v1/blog/delete-blog/${blogToDelete}`,
-    );
-    if (data.success) {
-      toast.success(data.message);
-      fetchAllBlogs();
-    } else {
-      toast.error(data.message);
-    }
-    setDeleteLoading(false);
-    try {
-    } catch (error: any) {
-      toast.error(error?.data?.message);
-      setDeleteLoading(false);
+      toast.error(error.response?.data?.message || "Failed to fetch blogs");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -85,171 +85,231 @@ export default function ExistingPost() {
     fetchAllBlogs();
   }, []);
 
+  const filteredBlogs = useMemo(() => {
+    if (!searchQuery) return blogs;
+    return blogs.filter((blog) =>
+      blog.title.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [blogs, searchQuery]);
+
+  const handleDeleteBlog = async () => {
+    if (!blogToDelete) return;
+    setIsDeleting(true);
+    try {
+      const { data } = await axios.delete(
+        `${process.env.NEXT_PUBLIC_SERVER_ADDRESS}/api/v1/blog/delete-blog/${blogToDelete}`
+      );
+      if (data.success) {
+        toast.success(data.message);
+        setBlogs((prev) => prev.filter((b) => b._id !== blogToDelete));
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || "Failed to delete blog");
+    } finally {
+      setIsDeleting(false);
+      setBlogToDelete(null);
+    }
+  };
+
   return (
-    <div className="mx-0 md:mx-5">
-      <section>
-        <h3 className="font-bold text-xl mb-5 mt-10">Exisiting Posts</h3>
-        <Table className="bg-[#3f4f5f7] rounded-lg overflow-hidden">
-          <TableHeader className="bg-[#f4f5f7] dark:bg-gray-800">
-            <TableRow>
-              <TableHead className="dark:text-gray-100 font-extrabold">
-                #
-              </TableHead>
-              <TableHead className="dark:text-gray-100 font-extrabold">
-                Title
-              </TableHead>
-              <TableHead className="dark:text-gray-100 font-extrabold">
-                Category
-              </TableHead>
-              <TableHead className="dark:text-gray-100 font-extrabold">
-                Status
-              </TableHead>
-              <TableHead className="dark:text-gray-100 font-extrabold">
-                Published At
-              </TableHead>
-              <TableHead className="dark:text-gray-100 font-extrabold">
-                Created
-              </TableHead>
-              <TableHead className="dark:text-gray-100 font-extrabold">
-                Updated
-              </TableHead>
-              <TableHead className="dark:text-gray-100 font-extrabold">
-                Action
-              </TableHead>
-            </TableRow>
-          </TableHeader>
+    <div className="p-6 max-w-7xl mx-auto space-y-6">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Blog Posts</h1>
+          <p className="text-muted-foreground mt-1">
+            Manage your blog content, edit existing posts, or publish new ones.
+          </p>
+        </div>
+        <Button asChild>
+          <Link href="/blog/create">
+            <Plus className="w-4 h-4 mr-2" /> Create New Post
+          </Link>
+        </Button>
+      </div>
 
-          <TableBody>
-            {spinnerLoading ? (
+      <Card>
+        <CardHeader className="px-6 py-4 border-b">
+            <div className="flex items-center justify-between">
+                <div>
+                    <CardTitle>Existing Posts</CardTitle>
+                    <CardDescription>
+                        Total {blogs.length} posts found.
+                    </CardDescription>
+                </div>
+                <div className="relative w-full max-w-xs">
+                    <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      placeholder="Search by title..."
+                      className="pl-9"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                    />
+                </div>
+            </div>
+        </CardHeader>
+
+        <CardContent className="p-0">
+          <Table>
+            <TableHeader className="bg-muted/50">
               <TableRow>
-                <TableCell
-                  colSpan={7}
-                  className="text-center py-4 dark:text-gray-100"
-                >
-                  <div className="flex justify-center items-center space-x-2 py-15">
-                    <Spinner />
-                    <span>Loading blogs...</span>
-                  </div>
-                </TableCell>
+                {/* 1. Added Serial Number Header */}
+                <TableHead className="w-[50px]">#</TableHead> 
+                <TableHead className="w-[350px]">Post Details</TableHead>
+                <TableHead>Category</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Author</TableHead>
+                <TableHead>Date</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
               </TableRow>
-            ) : blogs.length > 0 ? (
-              blogs.map((post, index) => (
-                <TableRow key={post._id} className="dark:hover:bg-gray-700">
-                  <TableCell className="dark:text-gray-100">
-                    <b> {index + 1}</b>
-                  </TableCell>
-                  <TableCell className="dark:text-gray-100">
-                    <Link href={`/blog/existing-post/${post.slug}`}>{post?.title}</Link>
-                  </TableCell>
-                  <TableCell className="dark:text-gray-100">
-                    {post?.category?.name}
-                    <br />
-                    {post?.subCategory?.name}
-                  </TableCell>
-                  <TableCell className="dark:text-gray-100">
-                    <Badge
-                      className={`
-    capitalize
-    ${post?.status === "Published" ? "bg-green-700 font-bold text-white" : ""}
-    ${post?.status === "Unpublished" ? "bg-red-500 font-bold text-white" : ""}
-  `}
-                    >
-                      {post?.status}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="dark:text-gray-100">
-                    {dayjs(post?.publishedAt).format("DD-MMM-YYYY")}
-                  </TableCell>
-                  <TableCell className="dark:text-gray-100">
-                    {dayjs(post?.createdAt).format("DD-MMM-YYYY hh:mm A")}
-                    <br />
-                    by {post?.createdBy?.name}
-                  </TableCell>
-                  <TableCell className="dark:text-gray-100">
-                    {dayjs(post?.updatedAt).fromNow()}
-                  </TableCell>
-                  <TableCell className="dark:text-gray-100">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="flex items-center cursor-pointer"
-                        >
-                          <MoreHorizontal className="w-4 h-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
+            </TableHeader>
+            <TableBody>
+              {isLoading ? (
+                // 2. Added Skeleton for Serial Column
+                Array.from({ length: 5 }).map((_, i) => (
+                  <TableRow key={i}>
+                    <TableCell><Skeleton className="h-4 w-4" /></TableCell>
+                    <TableCell><div className="space-y-2"><Skeleton className="h-4 w-[250px]" /><Skeleton className="h-3 w-[100px]" /></div></TableCell>
+                    <TableCell><Skeleton className="h-4 w-[100px]" /></TableCell>
+                    <TableCell><Skeleton className="h-5 w-[80px] rounded-full" /></TableCell>
+                    <TableCell><Skeleton className="h-4 w-[120px]" /></TableCell>
+                    <TableCell><Skeleton className="h-4 w-[100px]" /></TableCell>
+                    <TableCell className="text-right"><Skeleton className="h-8 w-8 ml-auto" /></TableCell>
+                  </TableRow>
+                ))
+              ) : filteredBlogs.length > 0 ? (
+                filteredBlogs.map((post, index) => (
+                  <TableRow key={post._id} className="group">
+                    
+                    {/* 3. Render the Serial Number */}
+                    <TableCell className="font-medium text-muted-foreground">
+                        {index + 1}
+                    </TableCell>
 
-                      <DropdownMenuContent align="end" className="w-36">
-                        <DropdownMenuItem
-                          className="flex items-center gap-2 cursor-pointer font-bold"
-                          onClick={() => alert(`Edit user ${post._id}`)}
+                    <TableCell>
+                      <div className="flex flex-col gap-1">
+                        <Link 
+                            href={`/blog/existing-post/${post.slug}`} 
+                            className="font-semibold hover:text-primary transition-colors line-clamp-1"
                         >
-                          <Edit className="w-4 h-4" /> Edit
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          className="flex items-center gap-2 text-destructive cursor-pointer font-bold"
-                          onClick={() => setBlogToDelete(post._id)}
-                        >
-                          <Trash className="w-4 h-4" /> Delete
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                          {post.title}
+                        </Link>
+                        <span className="text-xs text-muted-foreground line-clamp-1 flex items-center gap-1">
+                            <FileText className="w-3 h-3" /> /{post.slug}
+                        </span>
+                      </div>
+                    </TableCell>
+
+                    <TableCell>
+                      <div className="flex flex-col text-sm">
+                        <span className="font-medium">{post.category?.name}</span>
+                        {post.subCategory && (
+                          <span className="text-xs text-muted-foreground">
+                            {post.subCategory.name}
+                          </span>
+                        )}
+                      </div>
+                    </TableCell>
+
+                    <TableCell>
+                      <Badge
+                        variant={post.status === "Published" ? "default" : "secondary"}
+                        className={`
+                          ${post.status === "Published" ? "bg-green-600 hover:bg-green-700" : ""}
+                          ${post.status === "Unpublished" ? "bg-red-500 text-white hover:bg-red-600" : ""}
+                        `}
+                      >
+                        {post.status}
+                      </Badge>
+                    </TableCell>
+
+                    <TableCell>
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                            <User className="w-3 h-3" />
+                            {post.createdBy?.name || "Unknown"}
+                        </div>
+                    </TableCell>
+
+                    <TableCell>
+                      <div className="flex flex-col gap-1 text-sm">
+                        <div className="flex items-center gap-2" title="Published At">
+                            <Calendar className="w-3 h-3 text-muted-foreground" />
+                            <span>{dayjs(post.publishedAt).format("DD MMM, YYYY")}</span>
+                        </div>
+                        <span className="text-xs text-muted-foreground">
+                          Updated {dayjs(post.updatedAt).fromNow()}
+                        </span>
+                      </div>
+                    </TableCell>
+
+                    <TableCell className="text-right">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon" className="h-8 w-8">
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem asChild>
+                            <Link href={`/blog/edit/${post._id}`} className="cursor-pointer flex w-full items-center">
+                                <Edit className="mr-2 h-4 w-4" /> Edit
+                            </Link>
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem
+                            className="text-red-600 focus:text-red-600 cursor-pointer"
+                            onClick={() => setBlogToDelete(post._id)}
+                          >
+                            <Trash className="mr-2 h-4 w-4" /> Delete
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  {/* 4. Updated colSpan to 7 to account for new column */}
+                  <TableCell colSpan={7} className="h-64 text-center">
+                    <div className="flex flex-col items-center justify-center text-muted-foreground">
+                        <AlertCircle className="w-10 h-10 mb-2 opacity-20" />
+                        <p>No blogs found matching your criteria.</p>
+                        {searchQuery && (
+                            <Button variant="link" onClick={() => setSearchQuery("")} className="mt-2">
+                                Clear search
+                            </Button>
+                        )}
+                    </div>
                   </TableCell>
                 </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={7}
-                  className="text-center py-15 dark:text-gray-100 font-bold"
-                >
-                  No blogs found.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-        <AlertDialog
-          open={!!blogToDelete}
-          onOpenChange={(open) => !open && setBlogToDelete(null)}
-        >
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-              <AlertDialogDescription>
-                This action cannot be undone. This will permanently delete this
-                blog, including all its data.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel
-                disabled={deleteLoading}
-                className="cursor-pointer"
-              >
-                Cancel
-              </AlertDialogCancel>
-              <AlertDialogAction
-                className="bg-red-600 hover:bg-red-700 text-white cursor-pointer"
-                onClick={() => {
-                  handleDeleteBlog(blogToDelete!);
-                }}
-                disabled={deleteLoading}
-              >
-                {deleteLoading ? (
-                  <div className="flex items-center gap-2">
-                    <Spinner className="text-white" /> Deleting...
-                  </div>
-                ) : (
-                  <>
-                    <Trash className="w-4 h-4" /> Delete
-                  </>
-                )}
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
-      </section>
+              )}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+      
+      {/* Alert Dialog (Same as before) */}
+      <AlertDialog open={!!blogToDelete} onOpenChange={(open) => !open && setBlogToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the blog post.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-red-600 hover:bg-red-700"
+              onClick={handleDeleteBlog}
+              disabled={isDeleting}
+            >
+              {isDeleting ? "Deleting..." : "Delete Post"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

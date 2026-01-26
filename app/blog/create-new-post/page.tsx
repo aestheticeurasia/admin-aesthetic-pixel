@@ -1,39 +1,56 @@
 "use client";
 
+import { useEffect, useState } from "react";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import axios from "axios";
+import dayjs from "dayjs";
+import { toast } from "sonner";
+import {
+  CalendarDays,
+  CloudUpload,
+  ChevronLeft,
+  Save,
+  Settings2,
+  Globe,
+  ImageIcon,
+  Search,
+  SquareCheckBig,
+  StickyNote,
+} from "lucide-react";
+
+// UI Components
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { useCategoryStore } from "@/store/useCategory";
-import { useSubCategoryStore } from "@/store/useSubCategory";
-import { CalendarDays, CloudUpload } from "lucide-react";
-import Image from "next/image";
-import { useEffect, useState } from "react";
-import BlockEditor from "@/app/components/BlockNoteEditor";
-import { Calendar } from "@/components/ui/calendar";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import dayjs from "dayjs";
-import axios from "axios";
-import { toast } from "sonner";
+import { Calendar } from "@/components/ui/calendar";
 import { Spinner } from "@/components/ui/spinner";
-import { useRouter } from "next/navigation";
+import { Badge } from "@/components/ui/badge";
+
+// Custom Components & Stores
+import BlockEditor from "@/app/components/BlockNoteEditor";
+import { useCategoryStore } from "@/store/useCategory";
+import { useSubCategoryStore } from "@/store/useSubCategory";
 
 export default function CreateNewPost() {
+  const router = useRouter();
   const [createLoading, setCreateLoading] = useState(false);
+
+  // Form State
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [category, setCategory] = useState("");
@@ -45,25 +62,14 @@ export default function CreateNewPost() {
   const [date, setDate] = useState<Date | undefined>(undefined);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
-  const router = useRouter();
 
+  // Store & Logic
   const { categories, fetchCategories } = useCategoryStore();
-  const {
-    subCategories,
-    fetchSubCategories,
-  } = useSubCategoryStore();
+  const { subCategories, fetchSubCategories } = useSubCategoryStore();
   const [parentCategory, setParentCategory] = useState("");
 
-  const handleCoverPhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    setCoverPhoto(file);
-    setPreviewUrl(URL.createObjectURL(file));
-  };
-
   const filteredSubs = subCategories.filter(
-    (sub) => (sub.parentCategory as any)?._id === parentCategory
+    (sub) => (sub.parentCategory as any)?._id === parentCategory,
   );
 
   useEffect(() => {
@@ -71,9 +77,19 @@ export default function CreateNewPost() {
     if (subCategories.length === 0) fetchSubCategories();
   }, []);
 
-  //create blog
+  const handleCoverPhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setCoverPhoto(file);
+    setPreviewUrl(URL.createObjectURL(file));
+  };
+
   const handleCreateBlog = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!title) {
+      toast.error("Title is required");
+      return;
+    }
     setCreateLoading(true);
     const formData = new FormData();
     formData.append("title", title);
@@ -90,315 +106,305 @@ export default function CreateNewPost() {
       const res = await axios.post(
         `${process.env.NEXT_PUBLIC_SERVER_ADDRESS}/api/v1/blog/create-blog`,
         formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
+        { headers: { "Content-Type": "multipart/form-data" } },
       );
-
-      //reset form
-      setTitle("");
-      setContent("");
-      setCategory("");
-      setSubCategory("");
-      setCoverPhoto(null);
-      setPreviewUrl(null);
-      setMetaDescription("");
-      setExcerpt("");
-      setStatus("Draft");
-      setDate(undefined);
-      toast.success(res.data?.message);
+      toast.success(res.data?.message || "Post created successfully");
       router.push("/blog/existing-post/");
     } catch (error: any) {
-      console.error(error);
-      toast.error(error.response?.data?.message);
+      toast.error(error.response?.data?.message || "Something went wrong");
     } finally {
       setCreateLoading(false);
     }
   };
 
   return (
-    <div className="container">
+    <div className="min-h-screen bg-slate-50 dark:bg-[#0a0a0a] text-zinc-900 dark:text-zinc-100 pb-20 transition-colors duration-500">
       <form onSubmit={handleCreateBlog}>
-        <div className="flex justify-between items-center p-5">
-          <h1 className="text-3xl font-bold mb-5">Create New Post</h1>
-          <div>
-            <Button
-              type="submit"
-              className="cursor-pointer"
-              variant="destructive"
-              disabled={createLoading}
-            >
-              {createLoading && <Spinner />}
-              Save
-            </Button>
+        {/* Top Sticky Bar */}
+        <header className="sticky top-0 z-40 w-full border-b border-zinc-200 dark:border-zinc-800 bg-white/70 dark:bg-black/60 backdrop-blur-xl">
+          <div className="flex h-16 items-center justify-between px-6 lg:px-10">
+            <div className="flex items-center gap-4">
+              <Button
+                variant="ghost"
+                size="icon"
+                type="button"
+                className="text-zinc-500 dark:text-zinc-400 hover:text-black dark:hover:text-white cursor-pointer"
+                onClick={() => router.back()}
+              >
+                <ChevronLeft className="h-5 w-5" />
+              </Button>
+              <div className="h-6 w-px bg-zinc-200 dark:bg-zinc-800" />
+              <div>
+                <h1 className="text-sm font-semibold tracking-tight">
+                  Post Editor
+                </h1>
+                <p className="text-[10px] uppercase tracking-widest text-indigo-600 dark:text-zinc-500 font-bold italic">
+                  Drafting mode
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-4">
+              <Button
+                type="submit"
+                className="bg-red-600 text-white hover:bg-red-700 px-8 rounded-full shadow-[0_0_20px_rgba(220,38,38,0.3)] transition-all active:scale-95 cursor-pointer font-bold"
+                disabled={createLoading}
+              >
+                {createLoading ? (
+                  <Spinner className="mr-2 h-4 w-4" />
+                ) : (
+                  <Save className="mr-2 h-4 w-4" />
+                )}
+                Publish
+              </Button>
+            </div>
           </div>
-        </div>
-        <div className="grid lg:grid-cols-12 gap-10 px-0 md:px-20">
-          <section className="lg:col-span-7">
-            <div className="space-y-3 mt-5">
-              <Label htmlFor="title" className="text-lg font-bold">
-                Title
+        </header>
+
+        <main className="flex flex-col lg:flex-row gap-10 p-6 lg:p-10 max-w-[1600px] mx-auto">
+          {/* Editor Column */}
+          <div className="flex-1 space-y-10">
+            <div className="space-y-4">
+              <Label className="text- font-black text-zinc-400 dark:text-zinc-600 uppercase tracking-[0.3em]">
+                Article Headline
               </Label>
               <Input
-                type="text"
-                id="title"
-                name="title"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                placeholder="Post Title"
-                className="h-11 bg-[#f6f7f9] font-bold text-xl"
+                placeholder="Enter blog title..."
+                className=" h-12 text-zinc-900 dark:text-zinc-100"
                 required
               />
             </div>
-            <div className="space-y-3 mt-5">
-              <Label htmlFor="content" className="text-lg font-bold">
-                Post Content
-              </Label>
-              <div className="border-2 rounded-md p-2 dark:bg-neutral-900 min-h-[500px]">
+
+            <div className="space-y-4">
+              <div className="flex items-center justify-between border-b border-zinc-200 dark:border-zinc-900 pb-3">
+                <Label className="font-black text-zinc-400 dark:text-zinc-600 uppercase tracking-[0.3em]">
+                  Story Content
+                </Label>
+              </div>
+              <div
+                className="rounded-3xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#0c0c0c] 
+              shadow-xl dark:shadow-2xl min-h-screen p-3"
+              >
                 <BlockEditor value={content} onChange={setContent} />
               </div>
             </div>
-          </section>
+          </div>
 
-          {/* Setting Section */}
-          <section className="lg:col-span-5">
-            <div className="border-2 rounded-md p-4">
-              <h1 className="text-xl font-bold border-b-2 pb-2">
-                Post Setting
-              </h1>
-              <div className="w-full mt-5">
-                <Label htmlFor="mainCategory">Main Category</Label>
-
-                <Select
-                  name="mainCategory"
-                  value={parentCategory}
-                  onValueChange={(value) => {
-                    setParentCategory(value);
-                    setCategory(value);
-                    setSubCategory("");
-                  }}
-                >
-                  <SelectTrigger className="w-full bg-[#f6f7f9] py-6 mt-2">
-                    <SelectValue placeholder="Select main category" />
-                  </SelectTrigger>
-
-                  <SelectContent>
-                    {categories.length === 0 ? (
-                      <SelectItem disabled value="no-category">
-                        No categories found
-                      </SelectItem>
-                    ) : (
-                      categories.map((cat) => (
-                        <SelectItem key={cat._id} value={cat._id}>
+          {/* Settings Sidebar  */}
+          <aside className="w-full lg:w-[420px] space-y-6">
+            {/* Categorization */}
+            <div className="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/20 p-6 space-y-5 shadow-sm dark:shadow-none">
+              <h2 className="text-[11px] font-bold uppercase tracking-widest text-indigo-600 dark:text-zinc-500 flex items-center gap-2">
+                <Settings2 className="h-3.5 w-3.5 text-red-500" />{" "}
+                Categorization
+              </h2>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label className="text-xs text-zinc-500 dark:text-zinc-400 ml-1 font-medium">
+                    Main Category
+                  </Label>
+                  <Select
+                    value={parentCategory}
+                    onValueChange={(v) => {
+                      setParentCategory(v);
+                      setCategory(v);
+                      setSubCategory("");
+                    }}
+                  >
+                    <SelectTrigger className="bg-zinc-50 dark:bg-black border-zinc-200 dark:border-zinc-800 h-12 rounded-xl focus:ring-red-600 w-full cursor-pointer transition-colors">
+                      <SelectValue placeholder="Select Category" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-200">
+                      {categories.map((cat) => (
+                        <SelectItem
+                          key={cat._id}
+                          value={cat._id}
+                          className="cursor-pointer"
+                        >
                           {cat.name}
                         </SelectItem>
-                      ))
-                    )}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="w-full mt-5">
-                <Label htmlFor="subCategory">Sub Category</Label>
-
-                <Select
-                  name="subCategory"
-                  disabled={!parentCategory}
-                  value={subCategory}
-                  onValueChange={(value) => setSubCategory(value)}
-                >
-                  <SelectTrigger className="w-full bg-[#f6f7f9] py-6 mt-2">
-                    <SelectValue
-                      placeholder={
-                        !parentCategory
-                          ? "Select parent category first"
-                          : filteredSubs.length === 0
-                          ? "No subcategories found"
-                          : "Select sub category"
-                      }
-                    />
-                  </SelectTrigger>
-
-                  <SelectContent>
-                    <SelectGroup>
-                      <SelectLabel>Sub Categories</SelectLabel>
-
-                      {filteredSubs.length === 0 ? (
-                        <div className="px-3 py-2 text-sm text-muted-foreground">
-                          No subcategories under this category
-                        </div>
-                      ) : (
-                        filteredSubs.map((sub) => (
-                          <SelectItem key={sub?._id} value={sub?._id}>
-                            {sub?.name}
-                          </SelectItem>
-                        ))
-                      )}
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
-              </div>
-              {/* <div className="space-y-3 mt-5">
-                <Label htmlFor="tag">Tag</Label>
-                <Input
-                  type="text"
-                  id="tag"
-                  name="tag"
-                  value={tag}
-                  onChange={(e) => setTag(e.target.value)}
-                  placeholder="Post Tag"
-                  className="h-11 bg-[#f6f7f9]"
-                  required
-                />
-              </div> */}
-            </div>
-
-            {/* Cover Photo */}
-            <div className="border-2 p-4 mt-5 rounded-md">
-              <div>
-                <Label htmlFor="coverPhoto" className="text-lg font-bold pb-2">
-                  Cover Photo
-                </Label>
-
-                <div
-                  className="mt-3 w-full h-56 border-3 border-dashed rounded-md flex items-center justify-center cursor-pointer dark:bg-gray-900 bg-[#f6f7f9] hover:bg-gray-100 transition"
-                  onClick={() => document.getElementById("coverPhoto")?.click()}
-                >
-                  {previewUrl ? (
-                    <Image
-                      src={previewUrl}
-                      alt="Cover preview"
-                      width={100}
-                      height={50}
-                      className="w-full h-full object-cover rounded-md"
-                    />
-                  ) : (
-                    <div className="flex flex-col items-center justify-center space-y-3 text-center p-4">
-                      <div className="p-4 rounded-full bg-red-700 border shadow-sm">
-                        <CloudUpload className="h-8 w-8 text-white" />
-                      </div>
-                      <div className="space-y-1">
-                        <p className="text-sm font-medium text-foreground">
-                          Click to upload cover photo
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          SVG, PNG, JPG or GIF (max. 800x400px)
-                        </p>
-                      </div>
-                    </div>
-                  )}
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
 
-                {/* Hidden input */}
-                <input
-                  id="coverPhoto"
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={handleCoverPhotoChange}
-                />
+                <div className="space-y-2">
+                  <Label className="text-xs text-zinc-500 dark:text-zinc-400 ml-1 font-medium">
+                    Sub Category
+                  </Label>
+                  <Select
+                    disabled={!parentCategory}
+                    value={subCategory}
+                    onValueChange={setSubCategory}
+                  >
+                    <SelectTrigger className="bg-zinc-50 dark:bg-black border-zinc-200 dark:border-zinc-800 h-12 rounded-xl focus:ring-red-600 cursor-pointer w-full transition-colors">
+                      <SelectValue placeholder="Select Sub Category" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-200">
+                      {filteredSubs.map((sub) => (
+                        <SelectItem
+                          key={sub?._id}
+                          value={sub?._id}
+                          className="cursor-pointer"
+                        >
+                          {sub?.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
             </div>
 
-            {/* SEO */}
-            <div className="border-2 p-4 mt-5 rounded-md">
-              <h1 className="text-xl font-bold pb-2 border-b-2">SEO</h1>
-              <div className=" mt-5">
-                <Label htmlFor="metaDescription">Meta Description</Label>
-
-                <Textarea
-                  id="metaDescription"
-                  name="metaDescription"
-                  placeholder="Meta Description"
-                  className="bg-[#f6f7f9] mt-2"
-                  rows={6}
-                  value={metaDescription}
-                  onChange={(e) => setMetaDescription(e.target.value)}
-                />
+            {/* Cover Image */}
+            <div className="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/20 p-6 shadow-sm dark:shadow-none">
+              <h2 className="text-[11px] font-bold uppercase tracking-widest text-rose-600 dark:text-zinc-500 mb-4 flex items-center gap-2">
+                <ImageIcon className="h-3.5 w-3.5 text-red-500" /> Cover Photo
+              </h2>
+              <div
+                className="group relative aspect-video cursor-pointer overflow-hidden rounded-xl border-2 border-dashed border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-black transition hover:border-red-400 dark:hover:border-zinc-600"
+                onClick={() => document.getElementById("coverPhoto")?.click()}
+              >
+                {previewUrl ? (
+                  <>
+                    <Image
+                      src={previewUrl}
+                      alt="Preview"
+                      fill
+                      className="object-cover transition-transform duration-700 group-hover:scale-105"
+                    />
+                    <div className="absolute inset-0 flex items-center justify-center bg-indigo-600/20 dark:bg-black/60 opacity-0 transition-opacity group-hover:opacity-100 backdrop-blur-[2px]">
+                      <CloudUpload className="text-white h-8 w-8" />
+                    </div>
+                  </>
+                ) : (
+                  <div className="flex h-full flex-col items-center justify-center p-6 text-center">
+                    <CloudUpload className="h-6 w-6 text-zinc-300 dark:text-zinc-700 mb-2" />
+                    <p className="text-[10px] font-bold text-zinc-400 dark:text-zinc-600 uppercase tracking-tighter">
+                      Upload High-Res Image
+                    </p>
+                  </div>
+                )}
               </div>
-              <div className=" mt-2">
-                <Label htmlFor="excerpt">Excerpt</Label>
+              <input
+                id="coverPhoto"
+                type="file"
+                accept="image/*"
+                className="hidden cursor-pointer"
+                onChange={handleCoverPhotoChange}
+              />
+            </div>
 
-                <Textarea
-                  id="excerpt"
-                  name="excerpt"
-                  placeholder="Those text will show on the card"
-                  className="bg-[#f6f7f9] mt-2"
-                  rows={6}
-                  value={excerpt}
-                  onChange={(e) => setExcerpt(e.target.value)}
-                />
+            {/* SEO & Excerpt*/}
+            <div className="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/20 p-6 space-y-5 shadow-sm dark:shadow-none">
+              <h2 className="text-[11px] font-bold uppercase tracking-widest text-amber-600 dark:text-zinc-500 flex items-center gap-2">
+                <Search className="h-3.5 w-3.5 text-red-500" /> Search
+                Optimization
+              </h2>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label className="text-xs text-zinc-500 dark:text-zinc-400 ml-1 font-medium">
+                    Meta Description
+                  </Label>
+                  <Textarea
+                    placeholder="Brief summary for Google results..."
+                    className="bg-zinc-50 dark:bg-black border-zinc-200 dark:border-zinc-800 rounded-xl resize-none text-xs leading-relaxed focus:ring-red-600 text-zinc-900 dark:text-zinc-200"
+                    rows={3}
+                    value={metaDescription}
+                    onChange={(e) => setMetaDescription(e.target.value)}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-xs text-zinc-500 dark:text-zinc-400 ml-1 font-medium">
+                    Excerpt
+                  </Label>
+                  <Textarea
+                    placeholder="Short teaser for blog cards..."
+                    className="bg-zinc-50 dark:bg-black border-zinc-200 dark:border-zinc-800 rounded-xl resize-none text-xs leading-relaxed focus:ring-red-600 text-zinc-900 dark:text-zinc-200"
+                    rows={3}
+                    value={excerpt}
+                    onChange={(e) => setExcerpt(e.target.value)}
+                  />
+                </div>
               </div>
             </div>
 
-            {/* Published */}
-            <div className="border-2 p-4 mt-5 rounded-md">
-              <h1 className="text-xl font-bold pb-2 border-b-2">Publishing</h1>
-              <div className="mt-5 space-y-3">
-                <Label htmlFor="metaDescription">Status</Label>
-                <RadioGroup
-                  defaultValue="Draft"
-                  onValueChange={setStatus}
-                  value={status}
-                >
-                  <div className="flex items-center gap-3 py-2">
-                    <RadioGroupItem
-                      value="Draft"
-                      id="r1"
-                      className="cursor-pointer "
-                    />
-                    <Label htmlFor="r1" className="cursor-pointer">
-                      Draft
-                    </Label>
-                  </div>
-                  <div className="flex items-center gap-3 py-2">
-                    <RadioGroupItem
-                      value="Published"
-                      id="r2"
-                      className="cursor-pointer"
-                    />
-                    <Label htmlFor="r2" className="cursor-pointer">
-                      Published
-                    </Label>
-                  </div>
-                </RadioGroup>
-              </div>
-              <hr className="my-5" />
-              <div className="space-y-3">
-                <Label htmlFor="date" className="px-1">
-                  Publish Date
+            {/* Publishing Panel */}
+            <div className="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/20 p-6 space-y-6 shadow-sm dark:shadow-none">
+              <h2 className="text-[11px] font-bold uppercase tracking-widest text-emerald-600 dark:text-zinc-500 flex items-center gap-2">
+                <Globe className="h-3.5 w-3.5 text-red-500" /> Distribution
+              </h2>
+
+              <RadioGroup
+                value={status}
+                onValueChange={setStatus}
+                className="flex gap-2"
+              >
+                <div className="flex-1">
+                  <RadioGroupItem
+                    value="Draft"
+                    id="draft"
+                    className="peer sr-only"
+                  />
+                  <Label
+                    htmlFor="draft"
+                    className="flex h-11 items-center justify-center rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-black px-3 text-[11px] font-bold uppercase tracking-tighter text-zinc-400 dark:text-zinc-600 transition-all peer-data-[state=checked]:border-red-600 peer-data-[state=checked]:bg-red-50 dark:peer-data-[state=checked]:bg-transparent peer-data-[state=checked]:text-red-600 dark:peer-data-[state=checked]:text-white cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-900"
+                  >
+                    <StickyNote className="mr-2 h-4 w-4" /> Draft
+                  </Label>
+                </div>
+                <div className="flex-1">
+                  <RadioGroupItem
+                    value="Published"
+                    id="published"
+                    className="peer sr-only"
+                  />
+                  <Label
+                    htmlFor="published"
+                    className="flex h-11 items-center justify-center rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-black px-3 text-[11px] font-bold uppercase tracking-tighter text-zinc-400 dark:text-zinc-600 transition-all peer-data-[state=checked]:border-red-600 peer-data-[state=checked]:bg-red-50 dark:peer-data-[state=checked]:bg-transparent peer-data-[state=checked]:text-red-600 dark:peer-data-[state=checked]:text-white cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-900"
+                  >
+                    <SquareCheckBig className="mr-2 h-4 w-4" /> Public
+                  </Label>
+                </div>
+              </RadioGroup>
+
+              <div className="space-y-2 pt-2 border-t border-zinc-100 dark:border-zinc-800/50">
+                <Label className="text-[10px] uppercase font-black text-zinc-400 dark:text-zinc-600 ml-1">
+                  Schedule Date
                 </Label>
                 <Popover open={open} onOpenChange={setOpen}>
-                  <PopoverTrigger asChild>
+                  <PopoverTrigger asChild className="cursor-pointer">
                     <Button
                       variant="outline"
-                      id="date"
-                      className="w-full justify-between font-normal h-11 cursor-pointer"
+                      className="w-full justify-start bg-zinc-50 dark:bg-black border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 h-12 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-900 cursor-pointer"
                     >
-                      {date ? dayjs(date).format("DD MMM YYYY") : "Select date"}
-                      <CalendarDays />
+                      <CalendarDays className="mr-3 h-4 w-4 text-red-500" />
+                      {date
+                        ? dayjs(date).format("MMMM D, YYYY")
+                        : "Publish Now"}
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent
-                    className="w-auto overflow-hidden p-0"
-                    align="start"
+                    className="w-auto p-0 bg-white dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800"
+                    align="end"
                   >
                     <Calendar
                       mode="single"
                       selected={date}
-                      captionLayout="dropdown"
-                      onSelect={(selectedDate) => {
-                        setDate(selectedDate);
+                      onSelect={(d) => {
+                        setDate(d);
                         setOpen(false);
                       }}
+                      className="cursor-pointer"
                     />
                   </PopoverContent>
                 </Popover>
               </div>
             </div>
-          </section>
-        </div>
+          </aside>
+        </main>
       </form>
     </div>
   );
